@@ -1,50 +1,76 @@
-import type { MetaFunction } from '@remix-run/node';
-import { useState } from 'react';
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import { json, type LoaderArgs, MetaFunction } from '@remix-run/node';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import type { ColorScheme } from '@mantine/core';
 import { ColorSchemeProvider, createEmotionCache, MantineProvider } from '@mantine/core';
 import { StylesPlaceholder } from '@mantine/remix';
 import { NotificationsProvider } from '@mantine/notifications';
 import { theme } from './theme';
 import { useLocalStorage } from '@mantine/hooks';
+import { authenticator } from './services/auth.server';
+import { DataContext } from './data/DataContext';
+import { ChatMessage, User } from '@prisma/client';
+import { getUserMessages } from './lib/Prisma';
 
 export const meta: MetaFunction = () => ({
-	charset: 'utf-8',
-	viewport: 'width=device-width,initial-scale=1',
+    charset: 'utf-8',
+    viewport: 'width=device-width,initial-scale=1',
 });
 
 createEmotionCache({ key: 'mantine' });
 
+export async function loader({ request, context }: LoaderArgs) {
+    const user = (await authenticator.isAuthenticated(request)) || null;
+    const messages = user ? await getUserMessages(user.id) : [];
+
+    return json({
+        userLoader: user,
+        messages,
+    });
+}
+
 export default function App() {
-	const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
-		key: 'color-scheme',
-		defaultValue: 'dark',
-	});
+    const { userLoader, messages } = useLoaderData();
+    const [user, setUser] = useState<User | null>(userLoader);
+    const [chatMessages, setChatMessages] = useState<ChatMessage[] | []>(messages);
 
-	const toggleColorScheme = (value?: ColorScheme) => {
-		let current: ColorScheme = value || colorScheme === 'dark' ? 'light' : 'dark';
-		setColorScheme(current);
-	};
+    useEffect(() => {
+        if (!user) {
+            setChatMessages([]);
+        }
+    }, [user]);
 
-	return (
-		<ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-			<MantineProvider theme={{ colorScheme, ...theme }} withGlobalStyles withNormalizeCSS>
-				<NotificationsProvider limit={3}>
-					<html lang='ru'>
-						<head>
-							<StylesPlaceholder />
-							<Meta />
-							<Links />
-						</head>
-						<body>
-							<Outlet />
-							<ScrollRestoration />
-							<Scripts />
-							<LiveReload />
-						</body>
-					</html>
-				</NotificationsProvider>
-			</MantineProvider>
-		</ColorSchemeProvider>
-	);
+    const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
+        key: 'color-scheme',
+        defaultValue: 'dark',
+    });
+
+    const toggleColorScheme = (value?: ColorScheme) => {
+        let current: ColorScheme = value || colorScheme === 'dark' ? 'light' : 'dark';
+        setColorScheme(current);
+    };
+
+    return (
+        <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+            <MantineProvider theme={{ colorScheme, ...theme }} withGlobalStyles withNormalizeCSS>
+                <NotificationsProvider limit={3}>
+                    <html lang="ru">
+                        <head>
+                            <StylesPlaceholder />
+                            <Meta />
+                            <Links />
+                        </head>
+                        <body>
+                            <DataContext.Provider value={{ user, setUser, chatMessages, setChatMessages }}>
+                                <Outlet />
+                            </DataContext.Provider>
+                            <ScrollRestoration />
+                            <Scripts />
+                            <LiveReload />
+                        </body>
+                    </html>
+                </NotificationsProvider>
+            </MantineProvider>
+        </ColorSchemeProvider>
+    );
 }

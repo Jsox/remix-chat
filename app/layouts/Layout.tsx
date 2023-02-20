@@ -4,12 +4,30 @@ import { NavbarSearch } from './../components/NavbarSearch/NavbarSearch';
 import { HeaderAction } from './../components/HeaderAction/HeaderAction';
 import { headerTopLinks } from '../data/links';
 import { useColors } from '../hooks/useColors';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
+import { useCatch, useLoaderData } from '@remix-run/react';
+import { DataContext } from '../data/DataContext';
+
+export function CatchBoundary() {
+    const caught = useCatch();
+
+    return (
+        <div>
+            <h1>Caught</h1>
+            <p>Status: {caught.status}</p>
+            <pre>
+                <code>{JSON.stringify(caught.data, null, 2)}</code>
+            </pre>
+        </div>
+    );
+}
 
 export default function Layout(props: any) {
     const { bodyStyles } = useColors();
     const [opened, { toggle }] = useDisclosure(false);
     const [scrollLocked, setScrollLocked] = useScrollLock();
+
+    const { user } = useContext(DataContext);
 
     useEffect(() => {
         setScrollLocked(opened);
@@ -19,24 +37,10 @@ export default function Layout(props: any) {
         <AppShell
             styles={{
                 main: { ...bodyStyles },
-                // minHeight: '100vh',
             }}
             navbarOffsetBreakpoint="md"
             asideOffsetBreakpoint="lg"
-            navbar={NavbarSearch({ opened, toggle })}
-            // navbar={
-            //     <Navbar
-            //         styles={{
-            //             background: theme.colorScheme === 'dark' ? theme.colors.darkBlue[9] : theme.colors.gray[0],
-            //         }}
-            //         p="md"
-            //         hiddenBreakpoint="sm"
-            //         hidden={!opened}
-            //         width={{ sm: 200, lg: 300 }}
-            //     >
-            //         <Text>Application navbar</Text>
-            //     </Navbar>
-            // }
+            navbar={NavbarSearch({ user, opened, toggle })}
             aside={
                 <MediaQuery smallerThan="lg" styles={{ display: 'none' }}>
                     <Aside style={{ background: 'transparent' }} p="md" width={{ lg: 250, xl: 300 }}>
@@ -47,11 +51,7 @@ export default function Layout(props: any) {
             // footer={<FooterLinks data={dataFooterLinks} />}
             header={HeaderAction({ links: headerTopLinks.mainLinks, opened, toggle })}
         >
-            {/* <ScrollArea style={{ height: '100%' }} type='scroll'>
-				<Container m={0} p={0} style={{ minHeight: '100%' }} size={'xl'}> */}
             {props.children}
-            {/* </Container>
-			</ScrollArea> */}
         </AppShell>
     );
 }

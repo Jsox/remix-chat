@@ -2,14 +2,11 @@ import { useEffect, useState } from 'react';
 import { useHydrated } from 'remix-utils';
 
 type ReturnParams = {
-    beenOnSite: boolean;
     fingerprint: string;
 };
 
 export function useFingerPrint(): ReturnParams {
     const hydrated = useHydrated();
-
-    const [beenOnSite, setBeenOnSite] = useState(false);
     const [fingerprint, setFingerprint] = useState('');
 
     useEffect(() => {
@@ -20,11 +17,11 @@ export function useFingerPrint(): ReturnParams {
                 const client = new ClientJS();
                 const visitorId = client.getFingerprint();
                 setFingerprint(visitorId);
-                console.log('Executed for:', Date.now() - start + 'ms');
+                console.log('Got fingerprint for:', Date.now() - start + 'ms');
             };
             setFp();
         }
     }, [hydrated]);
 
-    return { beenOnSite, fingerprint };
+    return { fingerprint };
 }

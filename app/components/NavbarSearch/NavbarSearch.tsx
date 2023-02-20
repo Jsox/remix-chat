@@ -10,10 +10,13 @@ import {
     ActionIcon,
     Tooltip,
     ScrollArea,
+    Flex,
 } from '@mantine/core';
 import { IconBulb, IconUser, IconCheckbox, IconSearch, IconPlus, IconSelector } from '@tabler/icons';
 import type { NavbarSearchProps } from '../../types';
 import { UserButton } from '../UserButton/UserButton';
+import { Form } from '@remix-run/react';
+import LogOutButton from '../LogOutButton';
 
 const useStyles = createStyles((theme) => ({
     navbar: {
@@ -132,7 +135,7 @@ const collections = [
 ];
 
 export function NavbarSearch(props: NavbarSearchProps) {
-    const { opened, toggle } = props;
+    const { opened, toggle, user } = props;
     const { classes } = useStyles();
 
     const mainLinks = links.map((link) => (
@@ -162,12 +165,30 @@ export function NavbarSearch(props: NavbarSearchProps) {
     return (
         <Navbar hidden={!opened} width={{ sm: 300 }} p="md" className={classes.navbar}>
             <Navbar.Section className={classes.section}>
-                <UserButton
-                    image="https://i.imgur.com/fGxgcDF.png"
-                    name="Bob Rulebreaker"
-                    email="Product owner"
-                    icon={<IconSelector size={14} stroke={1.5} />}
-                />
+                {user && (
+                    <UserButton
+                        image={user.avatar || ''}
+                        name={user.name || 'User'}
+                        email={user.email || '@'}
+                        icon={<IconSelector size={14} stroke={1.5} />}
+                    />
+                )}
+                {user && (
+                    <Flex justify={'space-evenly'} align={'center'}>
+                        <LogOutButton />
+                        <Text>{user.tokens}</Text>
+                    </Flex>
+                )}
+                {!user && (
+                    <>
+                        <Form action="/auth/github" method="post">
+                            <button>GitHub</button>
+                        </Form>
+                        <Form action="/auth/google" method="post">
+                            <button>Login with Google</button>
+                        </Form>
+                    </>
+                )}
             </Navbar.Section>
 
             <TextInput

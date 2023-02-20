@@ -1,25 +1,31 @@
-import { Box, Button, Grid, Group, Input, SimpleGrid, Textarea, TextInput, useMantineTheme } from '@mantine/core';
+import { Box, Button, Grid, Input } from '@mantine/core';
 import { IconQuestionMark, IconSend } from '@tabler/icons';
-import { useHydrated } from 'remix-utils';
 import { useColors } from './../hooks/useColors';
 import useBreakpoints from './../hooks/useBreakpoint';
-import { Form, useTransition } from '@remix-run/react';
+import { useFetcher, useTransition } from '@remix-run/react';
+import { useInputState } from '@mantine/hooks';
 
-export default function InputChatForm({ user }) {
-    const { isXs, smallerSm } = useBreakpoints();
+export default function InputChatForm() {
+    const { isXs } = useBreakpoints();
     const transition = useTransition();
     const isSubmitting = transition.state !== 'idle';
     const { primaryStyles, primaryTextColor } = useColors();
+    const [stringValue, setStringValue] = useInputState('');
+    const fetcher = useFetcher();
+    const onSubmit = (e) => {
+        // e.preventDefault();
+        setStringValue('');
+    };
 
-    // hydrated ? (
     return (
         <Box sx={{ maxWidth: 'md' }} mx="auto">
-            <Form method="post" action="/api/getAiAnswer">
+            <fetcher.Form method="post" onSubmit={onSubmit}>
                 <Grid align={'end'}>
-                    {/* <Grid.Col span={12}> */}
                     <Input
+                        onChange={(event) => setStringValue(event.currentTarget.value)}
                         w={'100%'}
                         mr={35}
+                        value={stringValue}
                         aria-label="Введите запрос"
                         icon={<IconQuestionMark />}
                         c={primaryTextColor}
@@ -27,48 +33,24 @@ export default function InputChatForm({ user }) {
                         rightSection={
                             <Button
                                 aria-label="Отправить запрос"
-                                // style={{ ...primaryStyles }}
                                 color={primaryStyles.backgroundColor}
                                 size={isXs ? 'md' : 'xl'}
                                 px={isXs ? 'xs' : 'lg'}
                                 radius={'sm'}
-                                disabled={isSubmitting || !user.id}
+                                loaderPosition="center"
+                                loading={isSubmitting}
+                                disabled={isSubmitting}
                                 variant={'filled'}
                                 type="submit"
                             >
                                 <IconSend size={26} />
                             </Button>
                         }
-                        // value={formValue}
-                        // onChange={(e) => setFormValue(e.target.value)}
                         name="question"
                         placeholder="Напишите свой вопрос"
-                        // label={isXs ? '' : 'Пообщаемся?'}
                     />
-                    {/* <input type="hidden" name="userFingerprint" value={user.fingerprint} /> */}
-                    {/* </Grid.Col> */}
-                    {/* <Grid.Col span={smallerSm ? 3 : 2}>
-                        <Button
-                            aria-label="Отправить запрос"
-                            // style={{ ...primaryStyles }}
-                            color={primaryStyles.backgroundColor}
-                            size={isXs ? 'md' : 'xl'}
-                            px={isXs ? 'xs' : 'lg'}
-                            radius={'sm'}
-                            disabled={isSubmitting || !user.id}
-                            variant={'filled'}
-                            type="submit"
-                        >
-                            <IconSend size={26} />
-                        </Button>
-                    </Grid.Col> */}
                 </Grid>
-            </Form>
+            </fetcher.Form>
         </Box>
     );
-    // ) : (
-    //     <Box sx={{ maxWidth: 'md' }} mx="auto">
-    //         секунду...
-    //     </Box>
-    // );
 }

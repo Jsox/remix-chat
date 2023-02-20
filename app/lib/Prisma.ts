@@ -1,14 +1,30 @@
-import { PrismaClient, type User, type ChatMessages, type MessageAuthor } from '@prisma/client';
+import { PrismaClient, type User, type ChatMessage, type MessageAuthor } from '@prisma/client';
 import ISR from 'faster-query';
+import auth from 'app/services/auth.server';
+import type { ChatMessage as GPTChatMessage } from '../lib/ai/types';
 
-const prisma = new PrismaClient();
+let prisma: PrismaClient;
+
+if (process.env.NODE_ENV === 'production') {
+    prisma = new PrismaClient();
+} else {
+    if (!global.prisma) {
+        global.prisma = new PrismaClient();
+    }
+    prisma = global.prisma;
+}
 
 class Prisma {
-    async userGetOrCreate(data: User) {
+    static async userGetOrCreate(data: User): Promise<User> {
+        const start = Date.now();
         let where = {};
         if (data.phone) {
             where = {
                 phone: data.phone,
+            };
+        } else if (data.email) {
+            where = {
+                email: data.email,
             };
         } else {
             where = {
@@ -19,9 +35,10 @@ class Prisma {
             await prisma.user.findUnique({
                 where,
             });
+        let key = data.phone || data.fingerprint || data.email || 'qwerty';
         const userExists = new ISR(exists, {
-            key: data.phone || data.fingerprint,
-            cacheTime: 500,
+            key,
+            cacheTime: 1000,
         });
         exists = await userExists.getData();
 
@@ -29,6 +46,7 @@ class Prisma {
 
         if (exists) {
             exists.password = '******';
+            console.log('Got from cache userGetOrCreate for:', Date.now() - start + 'ms');
             return exists;
         }
 
@@ -37,9 +55,35 @@ class Prisma {
         });
         console.log({ newUser });
         newUser.password = '******';
+        console.log('CREATED userGetOrCreate for:', Date.now() - start + 'ms');
         return newUser;
+    }
+
+    static async getUserMessages(uid: number | null): Promise<ChatMessage[] | []> {
+        if (!uid) return [];
+        const messages = async () =>
+            await prisma.chatMessage.findMany({
+                where: {
+                    user: {
+                        id: uid,
+                    },
+                },
+                include: {
+                    user: true,
+                },
+                orderBy: {
+                    created: 'asc',
+                },
+            });
+        const mgs = new ISR(messages, {
+            key: `${uid}-all-messages`,
+            cacheTime: 5000,
+            // isLogging: true,
+        });
+        return mgs.getData() || [];
     }
 }
 
-export const p = new Prisma();
-export const userGetOrCreate = p.userGetOrCreate;
+export const prismaClient = prisma;
+export const userGetOrCreate = Prisma.userGetOrCreate;
+export const getUserMessages = Prisma.getUserMessages;

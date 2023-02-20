@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useState, useEffect } from 'react';
 
-export function useTime(dateString: number | string) {
+export function useTime(dateString: number | string | Date) {
     moment.locale('ru');
 
     // const [timeAgo, settimeAgo] = useState(moment(dateString).fromNow());
