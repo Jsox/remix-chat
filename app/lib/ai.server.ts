@@ -51,6 +51,7 @@ export class OpenAI {
         this.api = new ChatGPTAPI({
             apiKey: process.env.OPENAI_API_KEY || '',
             completionParams: {
+                max_tokens: 60,
                 model: OpenAI.model,
             },
             maxResponseTokens: this.maxResponseTokens,

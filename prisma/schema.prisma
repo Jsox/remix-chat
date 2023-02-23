@@ -8,16 +8,20 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  email        String?       @unique
-  name         String?
-  avatar       String?
-  fingerprint  String        @unique
-  isAdmin      Boolean?      @default(false)
-  phone        String?       @unique
-  tokens       Int?          @default(1000)
-  password     String?
-  chatMessages ChatMessage[]
+  id            Int            @id @default(autoincrement())
+  email         String?        @unique
+  name          String?
+  avatar        String?
+  fingerprint   String         @unique
+  isAdmin       Boolean?       @default(false)
+  phone         String?        @unique
+  tokens        Int?           @default(1000)
+  password      String?
+  chatMessages  ChatMessage[]
+  Completitions Completition[]
+  Projects      Project[]
+  Sections      Section[]
+  Topics        Topic[]
 
   @@index([fingerprint, id])
 }
@@ -39,6 +43,69 @@ model ChatMessage {
 
   @@index([messageId, conversationId])
   @@index([userId], map: "ChatMessage_userId_fkey")
+}
+
+model Completition {
+  id               Int       @id @default(autoincrement())
+  query            String
+  answer           String
+  promptTokens     Int
+  completionTokens Int
+  totalTokens      Int
+  messageId        String    @unique
+  userId           Int
+  user             User      @relation(fields: [userId], references: [id])
+  Section          Section[]
+  Topic            Topic[]
+}
+
+model Project {
+  id       Int       @id @default(autoincrement())
+  title    String
+  url      String    @unique
+  Sections Section[]
+  Topics   Topic[]
+  User     User?     @relation(fields: [userId], references: [id])
+  userId   Int?
+  active   Boolean   @default(true)
+}
+
+model Section {
+  id                     Int          @id @default(autoincrement())
+  sectionTitle           String
+  sectionMetaTitle       String?
+  sectionHtmlDescription String?
+  sectionMetaDescription String
+  sectionSlug            String?      @unique
+  sectionKeyWords        String?
+  completitionId         Int
+  completition           Completition @relation(fields: [completitionId], references: [id])
+  Project                Project      @relation(fields: [projectId], references: [id])
+  projectId              Int
+  User                   User         @relation(fields: [userId], references: [id])
+  userId                 Int
+  Topics                 Topic[]
+  active                 Boolean      @default(true)
+}
+
+model Topic {
+  id                   Int          @id @default(autoincrement())
+  topicTitle           String
+  topicMetaTitle       String?
+  topicHtmlSummary     String?
+  topicMetaDescription String
+  topicHtmlPost        String?
+  topicSlug            String?      @unique
+  topicKeyWords        String?
+  completitionId       Int
+  completition         Completition @relation(fields: [completitionId], references: [id])
+  Project              Project?     @relation(fields: [projectId], references: [id])
+  projectId            Int?
+  User                 User         @relation(fields: [userId], references: [id])
+  userId               Int
+  Section              Section?     @relation(fields: [sectionId], references: [id])
+  sectionId            Int?
+  active               Boolean      @default(true)
 }
 
 enum MessageAuthor {

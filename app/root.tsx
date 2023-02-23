@@ -11,6 +11,7 @@ import { authenticator } from './services/auth.server';
 import { DataContext } from './data/DataContext';
 import { ChatMessage, User } from '@prisma/client';
 import { getUserMessages } from './lib/Prisma';
+import { RemixSseProvider } from 'remix-sse/client';
 
 export const meta: MetaFunction = () => ({
     charset: 'utf-8',
@@ -62,7 +63,9 @@ export default function App() {
                         </head>
                         <body>
                             <DataContext.Provider value={{ user, setUser, chatMessages, setChatMessages }}>
-                                <Outlet />
+                                <RemixSseProvider>
+                                    <Outlet />
+                                </RemixSseProvider>
                             </DataContext.Provider>
                             <ScrollRestoration />
                             <Scripts />
