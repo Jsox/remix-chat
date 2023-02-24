@@ -11,9 +11,9 @@ export async function loader({ request, params }: LoaderArgs) {
 export default function Project() {
     const { projectSlug, sectionSlug } = useLoaderData();
     return (
-        <Layout>
+        <>
             <Outlet />
             <div>{sectionSlug}</div>
-        </Layout>
+        </>
     );
 }

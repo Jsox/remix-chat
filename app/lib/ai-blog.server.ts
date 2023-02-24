@@ -26,8 +26,9 @@ interface ISettings {
     generateBlogTopics: ISettingsCategory;
     generateBlogSections: ISettingsCategory;
     blogSectionExpander: ISettingsCategory;
+    test: ISettingsCategory;
 }
-type Job = 'generateBlogSections' | 'generateBlogSectionTopicsTitles' | 'generateBlogPostByTitle' | 'test';
+export type Job = 'generateBlogSections' | 'generateBlogSectionTopicsTitles' | 'generateBlogPostByTitle' | 'test';
 
 export class BlogGenerator {
     private settings: ISettings[ISettingsCategory];

@@ -1,7 +1,6 @@
 import { PrismaClient, type User, type ChatMessage, type MessageAuthor } from '@prisma/client';
 import ISR from 'faster-query';
 import auth from 'app/services/auth.server';
-import type { ChatMessage as GPTChatMessage } from '../lib/ai/types';
 
 let prisma: PrismaClient;
 

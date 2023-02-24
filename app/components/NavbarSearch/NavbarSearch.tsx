@@ -15,8 +15,8 @@ import {
 import { IconBulb, IconUser, IconCheckbox, IconSearch, IconPlus, IconSelector } from '@tabler/icons';
 import type { NavbarSearchProps } from '../../types';
 import { UserButton } from '../UserButton/UserButton';
-import { Form } from '@remix-run/react';
 import LogOutButton from '../LogOutButton';
+import LoginButtons from '../auth/LoginButtons';
 
 const useStyles = createStyles((theme) => ({
     navbar: {
@@ -174,21 +174,16 @@ export function NavbarSearch(props: NavbarSearchProps) {
                     />
                 )}
                 {user && (
-                    <Flex justify={'space-evenly'} align={'center'}>
+                    <Group align={'center'} grow my="xs">
                         <LogOutButton />
-                        <Text>{user.tokens}</Text>
-                    </Flex>
+                        <Tooltip label="Токенов на балансе">
+                            <Badge size="xl" variant="gradient" gradient={{ from: 'red', to: 'yellow', deg: 35 }}>
+                                {user.tokens?.toLocaleString()} τ
+                            </Badge>
+                        </Tooltip>
+                    </Group>
                 )}
-                {!user && (
-                    <>
-                        <Form action="/auth/github" method="post">
-                            <button>GitHub</button>
-                        </Form>
-                        <Form action="/auth/google" method="post">
-                            <button>Login with Google</button>
-                        </Form>
-                    </>
-                )}
+                {!user && <LoginButtons />}
             </Navbar.Section>
 
             <TextInput

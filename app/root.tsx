@@ -1,6 +1,6 @@
 import { json, type LoaderArgs, MetaFunction } from '@remix-run/node';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch, useLoaderData } from '@remix-run/react';
 import type { ColorScheme } from '@mantine/core';
 import { ColorSchemeProvider, createEmotionCache, MantineProvider } from '@mantine/core';
 import { StylesPlaceholder } from '@mantine/remix';
@@ -29,7 +29,19 @@ export async function loader({ request, context }: LoaderArgs) {
         messages,
     });
 }
+export function CatchBoundary() {
+    const caught = useCatch();
 
+    return (
+        <div>
+            <h1>Caught</h1>
+            <p>Status: {caught.status}</p>
+            <pre>
+                <code>{JSON.stringify(caught.data, null, 2)}</code>
+            </pre>
+        </div>
+    );
+}
 export default function App() {
     const { userLoader, messages } = useLoaderData();
     const [user, setUser] = useState<User | null>(userLoader);
@@ -54,7 +66,7 @@ export default function App() {
     return (
         <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
             <MantineProvider theme={{ colorScheme, ...theme }} withGlobalStyles withNormalizeCSS>
-                <NotificationsProvider limit={3}>
+                <NotificationsProvider position="top-right" limit={3}>
                     <html lang="ru">
                         <head>
                             <StylesPlaceholder />

@@ -30,7 +30,7 @@ model ChatMessage {
   id               Int           @id @default(autoincrement())
   userId           Int
   messageBy        MessageAuthor
-  created          DateTime
+  created          DateTime      @default(now())
   promptTokens     Int?
   completionTokens Int?
   totalTokens      Int?
@@ -45,10 +45,18 @@ model ChatMessage {
   @@index([userId], map: "ChatMessage_userId_fkey")
 }
 
+model Translate {
+  id   Int    @id @default(autoincrement())
+  ru   String @unique
+  en   String @unique
+  hash String @unique
+}
+
 model Completition {
   id               Int       @id @default(autoincrement())
   query            String
   answer           String
+  created          DateTime  @default(now())
   promptTokens     Int
   completionTokens Int
   totalTokens      Int
@@ -61,8 +69,9 @@ model Completition {
 
 model Project {
   id       Int       @id @default(autoincrement())
+  created  DateTime  @default(now())
   title    String
-  url      String    @unique
+  url      String
   Sections Section[]
   Topics   Topic[]
   User     User?     @relation(fields: [userId], references: [id])
@@ -72,6 +81,7 @@ model Project {
 
 model Section {
   id                     Int          @id @default(autoincrement())
+  created                DateTime     @default(now())
   sectionTitle           String
   sectionMetaTitle       String?
   sectionHtmlDescription String?
@@ -90,6 +100,7 @@ model Section {
 
 model Topic {
   id                   Int          @id @default(autoincrement())
+  created              DateTime     @default(now())
   topicTitle           String
   topicMetaTitle       String?
   topicHtmlSummary     String?

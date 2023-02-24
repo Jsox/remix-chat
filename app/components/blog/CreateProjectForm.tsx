@@ -1,24 +1,32 @@
 import { TextInput, type TextInputProps, ActionIcon, useMantineTheme } from '@mantine/core';
-import { IconSearch, IconArrowRight, IconArrowLeft } from '@tabler/icons';
+import { IconNewSection, IconPlus } from '@tabler/icons';
 
-export function InputWithButton(props: TextInputProps) {
+export default function CreateProjectForm(props: TextInputProps) {
     const theme = useMantineTheme();
 
     return (
         <TextInput
-            icon={<IconSearch size={18} stroke={1.5} />}
+            minLength={5}
+            maxLength={50}
+            icon={<IconNewSection size={30} stroke={1.5} />}
             radius="xl"
-            size="md"
+            size="lg"
             rightSection={
-                <ActionIcon size={32} radius="xl" color={theme.primaryColor} variant="filled">
-                    {theme.dir === 'ltr' ? (
-                        <IconArrowRight size={18} stroke={1.5} />
-                    ) : (
-                        <IconArrowLeft size={18} stroke={1.5} />
-                    )}
+                <ActionIcon
+                    loading={props.isLoading}
+                    type="submit"
+                    aria-label={'Создать новый проект'}
+                    mr={8}
+                    size={42}
+                    radius="xl"
+                    color={theme.primaryColor}
+                    variant="filled"
+                >
+                    <IconPlus size={26} stroke={1.5} />
                 </ActionIcon>
             }
-            placeholder="Search questions"
+            aria-label={'Название нового проекта'}
+            placeholder="Создать новый проект"
             rightSectionWidth={42}
             {...props}
         />

@@ -1,4 +1,3 @@
-import { createContext, useState } from 'react';
-import { ChatMessage } from '@prisma/client';
+import { createContext } from 'react';
 
-export const DataContext = createContext<ChatMessage[] | []>({});
+export const DataContext = createContext<any>({});

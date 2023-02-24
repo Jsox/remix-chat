@@ -1,16 +1,22 @@
-import { json, type ActionArgs } from '@remix-run/node';
+import { json, redirect, type ActionArgs } from '@remix-run/node';
 import Layout from '../../../layouts/Layout';
 import { useEffect, useRef, useState } from 'react';
 import { useEventSource, useSubscribe } from 'remix-sse/client';
-import { Outlet, useFetcher } from '@remix-run/react';
+import { Form, Outlet, useFetcher } from '@remix-run/react';
 import { BlogGenerator } from '../../../lib/ai-blog.server';
-import { Button, Checkbox, Flex } from '@mantine/core';
+import { Alert, Button, Checkbox, Flex } from '@mantine/core';
 import WaitingMessages from '../../../components/WaitingMessages';
 import { CheckboxCard } from '../../../components/CheckboxCard/CheckboxCard';
 import clearTextForJson from '../../../lib/clearTextForJson';
 import { Yandex } from 'yandex-cloud-translate';
+import CreateProjectForm from 'app/components/blog/CreateProjectForm';
+import { useInputState } from '@mantine/hooks';
+import { IconAlertCircle, IconCheck } from '@tabler/icons';
+import { showNotification } from '@mantine/notifications';
+// import { showNotification } from '@mantine/core';
 
 // import * as dotenv from 'dotenv';
+// import { useInputState } from '@mantine/hooks';
 // dotenv.config();
 
 export async function action({ request }: ActionArgs) {
@@ -62,7 +68,7 @@ export async function action({ request }: ActionArgs) {
 //     });
 // }
 
-export default function GenerateBlog() {
+export default function GenerateProject() {
     // const { user } = useContext(DataContext);
 
     const fetcher = useFetcher();
@@ -122,8 +128,48 @@ export default function GenerateBlog() {
         console.log('go');
     };
 
+    const [newProject, createNewProject] = useInputState('');
+    const newProjectFetcher = useFetcher();
+
+    const submitNewProject = () => {
+        newProjectFetcher.submit(
+            {
+                projectName: newProject,
+            },
+            {
+                method: 'post',
+                action: '/api/createProject',
+            }
+        );
+    };
+    if (newProjectFetcher.data && newProjectFetcher.data.error) {
+        showNotification({
+            id: 'fetcherError',
+            title: 'Ошибка!',
+            message: newProjectFetcher.data.error,
+            color: 'red',
+            icon: <IconAlertCircle />,
+        });
+    }
+    if (newProjectFetcher.data && !newProjectFetcher.data.error) {
+        showNotification({
+            id: 'fetcherError',
+            title: 'Отлично!',
+            message: `Проект "${newProjectFetcher.data.project.title}" создан!`,
+            color: 'green',
+            icon: <IconCheck />,
+        });
+    }
+
     return (
-        <Layout>
+        <>
+            <Form onSubmit={submitNewProject}>
+                <CreateProjectForm
+                    isLoading={newProjectFetcher.state != 'idle'}
+                    value={newProject}
+                    onChange={createNewProject}
+                />
+            </Form>
             <Flex mih={500} gap="md" justify="center" align="flex-start" direction="column" wrap="wrap">
                 {topicsTitles.map(
                     (topic, i) => (
@@ -148,6 +194,6 @@ export default function GenerateBlog() {
             </Button>
             <code ref={codeRef}></code>
             <code>{fetcher.data && JSON.stringify(fetcher.data.usage)}</code>
-        </Layout>
+        </>
     );
 }
