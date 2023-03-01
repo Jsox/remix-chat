@@ -1,9 +1,10 @@
-import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, CreateCompletionResponse, OpenAIApi } from 'openai';
 import { streamAsyncIterable } from './stream-async-iterable';
 import * as dotenv from 'dotenv';
 import { createParser } from 'eventsource-parser';
 import { fetchSSE } from './fetch-sse';
 import fs from 'fs';
+import { AiModels } from './AiModels';
 
 dotenv.config();
 
@@ -30,78 +31,17 @@ interface ISettings {
 }
 export type Job = 'generateBlogSections' | 'generateBlogSectionTopicsTitles' | 'generateBlogPostByTitle' | 'test';
 
-export class BlogGenerator {
+export class Generator {
     private settings: ISettings[ISettingsCategory];
     private model: 'text-davinci-003' | 'text-curie-001' | 'text-ada-001';
     generateNum: number;
+    private queryModel: ISettingsCategory;
+    private job: Job;
 
-    constructor(private job: Job, query: string, generateNum: number = 10) {
+    constructor(query: string, generateNum: number = 10) {
         this.model = 'text-davinci-003';
         this.generateNum = generateNum;
-        this.settings = {
-            test: {
-                model: this.model,
-                prompt: `${query}`,
-                temperature: 0.6,
-                max_tokens: 25,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0,
-                stream: false,
-            },
-            generateBlogSections: {
-                model: this.model,
-                prompt: `Expand the blog Theme in to high level blog sections. Blog Theme: ${query}\nGenerate ${this.generateNum} pcs.\nAnswer in JSON array:\n
-                    [{
-                        "sectionTitle": "",
-                        "sectionMetaTitle": "",
-                        "sectionHtmlDescription": "",
-                        "sectionMetaDescription": "",
-                        "sectionSlug": ""
-                        "sectionKeyWords": []
-                    }]\n\n`,
-                temperature: 0.6,
-                max_tokens: 4000,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0,
-                stream: false,
-            },
-            generateBlogSectionTopicsTitles: {
-                model: this.model,
-                prompt: `Expand the blog Section in to blog topics.\nBlog Section: ${query}\nGenerate ${this.generateNum} pcs.\nAnswer in JSON array:\n
-                [
-                    "topicTitle": "",
-                    "topicMetaDescription": "",
-                ]`,
-                temperature: 0.8,
-                max_tokens: 2000,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0,
-                stream: false,
-            },
-            generateBlogPostByTitle: {
-                model: this.model,
-                prompt: `Expand the blog topic title in to a detailed professional, witty and clever blog post. Topic title: ${query}\n
-                    Answer in JSON array:\n
-                    {
-                        "topicTitle": "",
-                        "topicMetaTitle": "",
-                        "topicHtmlSummary": "",
-                        "topicMetaDescription": "",
-                        "topicHtmlPost": ""
-                        "topicSlug": ""
-                        "topicKeyWords": []
-                    }`,
-                temperature: 0.8,
-                max_tokens: 4000,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0,
-                stream: false,
-            },
-        };
+        this.settings = AiModels(query, this.model, this.generateNum);
     }
 
     async runSse(uuid) {
@@ -147,12 +87,12 @@ export class BlogGenerator {
         }
     }
 
-    async run() {
-        const queryModel = this.settings[this.job];
-        console.log(queryModel);
-
+    async generateBlogSections(): Promise<CreateCompletionResponse | Record<string, string>> {
         try {
-            const completion = await openai.createCompletion(queryModel);
+            this.job = 'generateBlogSections';
+            this.queryModel = this.settings[this.job];
+            console.log(this.queryModel);
+            const completion = await openai.createCompletion(this.queryModel);
             console.log({ data: completion.data.choices[0] });
             return completion.data;
         } catch (error: any) {

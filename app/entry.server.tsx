@@ -2,7 +2,6 @@ import { renderToString } from 'react-dom/server';
 import { RemixServer } from '@remix-run/react';
 import type { EntryContext } from '@remix-run/node';
 import { injectStyles, createStylesServer } from '@mantine/remix';
-import { authenticator } from './services/auth.server';
 
 const server = createStylesServer();
 

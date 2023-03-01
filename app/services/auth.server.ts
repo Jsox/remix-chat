@@ -6,6 +6,7 @@ import { GitHubStrategy } from 'remix-auth-github';
 import { userGetOrCreate } from 'app/lib/Prisma';
 
 import { GoogleStrategy } from 'remix-auth-google';
+import { GoogleCredentialStrategy } from 'remix-auth-google-credential';
 
 export let authenticator = new Authenticator<User>(sessionStorage);
 
@@ -37,13 +38,28 @@ let googleStrategy = new GoogleStrategy(
             email: profile.emails[0].value,
             name: profile.displayName || 'Not provided',
             fingerprint: profile.id,
-            avatar: profile._json.picture || null,
+            avatar: profile.photos[0],
+        });
+    }
+);
+const googleCredentialStrategy = new GoogleCredentialStrategy(
+    {
+        clientId: 'YOUR_CLIENT_ID',
+        credentialId: 'fingerprint', // name of form field that stores credential. Default: credential
+    },
+    async (profile) => {
+        return userGetOrCreate({
+            email: profile.emails[0].value,
+            name: profile.displayName || 'Not provided',
+            fingerprint: profile.id,
+            avatar: profile.photos[0],
         });
     }
 );
 
 authenticator.use(gitHubStrategy);
 authenticator.use(googleStrategy);
+authenticator.use(googleCredentialStrategy);
 
 export default async function auth(request: Request): Promise<User | null> {
     let user = (await authenticator.isAuthenticated(request)) || null;

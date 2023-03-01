@@ -3,7 +3,6 @@ import { GithubIcon, DiscordIcon, TwitterIcon } from '@mantine/ds';
 import { GoogleIcon } from './GoogleIcon';
 import { FacebookIcon } from './FacebookIcon';
 import { useContext } from 'react';
-import { DataContext } from 'app/data/DataContext';
 import { useFetcher } from '@remix-run/react';
 import { IconLogout } from '@tabler/icons';
 

@@ -1,5 +1,7 @@
 import { createCookieSessionStorage } from '@remix-run/node';
-
+import * as dotenv from 'dotenv';
+dotenv.config();
+// console.log({ 'process.env': process.env });
 // export the whole sessionStorage object
 export let sessionStorage = createCookieSessionStorage({
     cookie: {

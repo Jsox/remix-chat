@@ -5,8 +5,8 @@ import useBrowserAuth from 'app/hooks/useBrowserAuth';
 import { useColors } from 'app/hooks/useColors';
 import CommentHtml from '../Comment';
 import InputChatForm from '../InputChatForm';
-import { useContext, useEffect } from 'react';
-import { DataContext } from 'app/data/DataContext';
+import { useOutletContext } from '@remix-run/react';
+import { useEffect } from 'react';
 
 interface IProps {
     // user: User;
@@ -15,7 +15,9 @@ interface IProps {
     // targetRefForScroll: HTMLElement;
 }
 export default function Messages() {
-    const { user, chatMessages, setChatMessages } = useContext(DataContext);
+    const { user } = useOutletContext();
+    const { chatMessages, setChatMessages } = {};
+
     // const { user } = useBrowserAuth();
 
     const { targetRef, scrollIntoView } = useScrollIntoView(
@@ -37,14 +39,15 @@ export default function Messages() {
         <Stack mih={'100%'} pos={'relative'} justify="space-between">
             {/* <p>{fromAi ? fromAi : 'Waiting...'}</p> */}
             <Box>
-                {chatMessages.map((data, i) => (
-                    <CommentHtml
-                        position={data.messageBy === 'AI' ? 'right' : 'left'}
-                        key={Math.random()}
-                        index={i}
-                        {...data}
-                    />
-                ))}
+                {chatMessages &&
+                    chatMessages.map((data, i) => (
+                        <CommentHtml
+                            position={data.messageBy === 'AI' ? 'right' : 'left'}
+                            key={Math.random()}
+                            index={i}
+                            {...data}
+                        />
+                    ))}
             </Box>
             <Paper
                 withBorder

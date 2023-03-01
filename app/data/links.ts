@@ -1,3 +1,42 @@
+import {
+    IconGauge,
+    IconWritingSign,
+    IconCalendarStats,
+    IconPresentationAnalytics,
+    IconFileAnalytics,
+    IconAdjustments,
+    IconLock,
+    type TablerIcon,
+} from '@tabler/icons';
+
+export type NavBarLinks = {
+    label: string;
+    icon: TablerIcon;
+    link?: string | null;
+    initiallyOpened?: undefined;
+    links?:
+        | {
+              label: string;
+              link: string;
+          }[]
+        | null;
+}[];
+
+export const navBarLinks: NavBarLinks = [
+    { label: 'Главная', icon: IconGauge, link: '/' },
+    {
+        label: 'Сгенерировать тексты',
+        icon: IconWritingSign,
+        initiallyOpened: true,
+        links: [
+            { label: 'Проект блога', link: '/generate/project' },
+            { label: 'AI21', link: '/generate/ai21' },
+            { label: 'Outlook', link: '/' },
+            { label: 'Real time', link: '/' },
+        ],
+    },
+];
+
 export const dataFooterLinks = [
     {
         title: 'Фотосессии',

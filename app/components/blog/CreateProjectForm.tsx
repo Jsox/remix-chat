@@ -1,32 +1,39 @@
-import { TextInput, type TextInputProps, ActionIcon, useMantineTheme } from '@mantine/core';
+import { TextInput, type TextInputProps, ActionIcon } from '@mantine/core';
+import { useFocusTrap } from '@mantine/hooks';
 import { IconNewSection, IconPlus } from '@tabler/icons';
+import { useColors } from '../../hooks/useColors';
 
-export default function CreateProjectForm(props: TextInputProps) {
-    const theme = useMantineTheme();
-
+interface ICreateProjectForm extends TextInputProps {
+    isloading: string;
+}
+export default function CreateProjectForm(props: ICreateProjectForm) {
+    const { primaryStyles } = useColors();
+    const focusTrapRef = useFocusTrap();
     return (
         <TextInput
+            ref={focusTrapRef}
             minLength={5}
-            maxLength={50}
-            icon={<IconNewSection size={30} stroke={1.5} />}
+            maxLength={60}
+            icon={<IconNewSection size={36} stroke={1.5} />}
             radius="xl"
-            size="lg"
+            size="xl"
             rightSection={
                 <ActionIcon
-                    loading={props.isLoading}
+                    loading={!!props.isloading}
                     type="submit"
                     aria-label={'Создать новый проект'}
-                    mr={8}
-                    size={42}
+                    mr={18}
+                    mt={0}
+                    size={46}
                     radius="xl"
-                    color={theme.primaryColor}
                     variant="filled"
+                    style={{ ...primaryStyles }}
                 >
                     <IconPlus size={26} stroke={1.5} />
                 </ActionIcon>
             }
             aria-label={'Название нового проекта'}
-            placeholder="Создать новый проект"
+            placeholder="Создать новый проект Блога"
             rightSectionWidth={42}
             {...props}
         />
