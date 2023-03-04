@@ -52,12 +52,12 @@ var core_1 = require("@mantine/core");
 var node_1 = require("@remix-run/node");
 var react_1 = require("@remix-run/react");
 var LoginButtons_1 = require("app/components/auth/LoginButtons");
-var useBreakpoint_1 = require("app/hooks/useBreakpoint");
 var Layout_1 = require("app/layouts/Layout");
 var auth_server_1 = require("app/services/auth.server");
 var react_2 = require("react");
 var Prisma_1 = require("app/lib/Prisma");
 var icons_1 = require("@tabler/icons");
+var useColors_1 = require("app/hooks/useColors");
 // export async function action({ request }) {
 //     const user = await auth(request);
 //     if (!user) return redirect('/generate/project', 401);
@@ -69,7 +69,6 @@ function loader(_a) {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    console.log({ params: params });
                     projectSlug = params.projectSlug, sectionSlug = params.sectionSlug;
                     return [4 /*yield*/, auth_server_1["default"](request)];
                 case 1:
@@ -131,8 +130,6 @@ function ProjectLayout() {
     var context = react_1.useOutletContext();
     var user = context.user, setAside = context.setAside;
     var _a = react_1.useLoaderData(), projects = _a.projects, sections = _a.sections, topics = _a.topics, projectSlug = _a.projectSlug, sectionSlug = _a.sectionSlug;
-    // console.log({ projects, user });
-    var _b = useBreakpoint_1["default"](), smallerSm = _b.smallerSm, isXl = _b.isXl;
     var active = 0;
     if (!user) {
         active = 0;
@@ -142,9 +139,12 @@ function ProjectLayout() {
         active = sections.length ? 3 : 2;
         active = projects.length ? 2 : 1;
     }
-    var aside = (React.createElement(core_1.Stepper, { mt: 'lg', size: smallerSm ? 'xs' : isXl ? 'md' : 'sm', active: active, orientation: "vertical", allowNextStepsSelect: false },
+    var aside = (React.createElement(core_1.Stepper, { mt: 'lg', size: 'md', 
+        // size={smallerSm ? 'sm' : isXl ? 'md' : 'sm'}
+        active: active, orientation: "vertical", allowNextStepsSelect: false },
         React.createElement(core_1.Stepper.Step, { label: "\u0412\u0445\u043E\u0434", description: "\u0410\u0432\u0442\u043E\u0440\u0438\u0437\u0443\u0439\u0442\u0435\u0441\u044C" },
-            React.createElement(LoginButtons_1["default"], null)),
+            React.createElement(LoginButtons_1["default"], null),
+            React.createElement(exports.StepperDesc, { title: "\u0410\u0432\u0442\u043E\u0440\u0438\u0437\u0430\u0446\u0438\u044F", desc: "\u0412\u043E\u0439\u0434\u0438\u0442\u0435 \u0441 \u043F\u043E\u043C\u043E\u0449\u044C\u044E \u0441\u043E\u0446.\u0441\u0435\u0442\u0435\u0439 \u0438 \u043D\u0430\u0447\u043D\u0438\u0442\u0435 \u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0441\u0442\u0430\u0442\u044C\u0438 \u0441 \u043F\u043E\u043C\u043E\u0449\u044C\u044E \u0418\u0418. \u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044F \u043F\u0440\u043E\u0441\u0442\u0430 \u0438 \u0431\u0435\u0441\u043F\u043B\u0430\u0442\u043D\u0430!" })),
         React.createElement(core_1.Stepper.Step, { label: "\u041F\u0440\u043E\u0435\u043A\u0442", description: "\u041D\u0430\u0437\u043E\u0432\u0438\u0442\u0435 \u043F\u0440\u043E\u0435\u043A\u0442" },
             React.createElement(exports.StepperDesc, { title: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u043E\u0435\u043A\u0442\u0430 \u0431\u043B\u043E\u0433\u0430", desc: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043A\u0440\u0430\u0442\u043A\u043E\u0435 \u043D\u043E \u0451\u043C\u043A\u043E\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0434\u043B\u044F \u043F\u0440\u043E\u0435\u043A\u0442\u0430 \u0431\u043B\u043E\u0433\u0430, \u043E\u043D\u043E \u0431\u0443\u0434\u0435\u0442 \u0432\u0437\u044F\u0442\u043E \u0437\u0430 \u043E\u0441\u043D\u043E\u0432\u0443, \u043F\u0440\u0438 \u0433\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u0438\r\n                    \u0440\u0430\u0437\u0434\u0435\u043B\u043E\u0432 \u0441\u0430\u0439\u0442\u0430." })),
         React.createElement(core_1.Stepper.Step, { label: "\u0420\u0430\u0437\u0434\u0435\u043B\u044B", description: "\u0421\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u0443\u0439\u0442\u0435 \u0440\u0430\u0437\u0434\u0435\u043B\u044B" },
@@ -162,10 +162,9 @@ function ProjectLayout() {
 exports["default"] = ProjectLayout;
 exports.StepperDesc = function (_a) {
     var title = _a.title, desc = _a.desc;
+    var gradientTitleColor = useColors_1.useColors().gradientTitleColor;
     return (React.createElement(React.Fragment, null,
-        React.createElement(core_1.Title, { align: "center", m: 0, py: 'md', order: 4 },
-            React.createElement(icons_1.IconBulb, { color: 'yellow' }),
-            " ",
-            title),
+        React.createElement(core_1.Divider, { mt: 'lg', label: React.createElement(icons_1.IconBulb, { size: 24 }), labelPosition: 'center' }),
+        React.createElement(core_1.Title, { fw: 600, gradient: gradientTitleColor, variant: 'gradient', align: "center", m: 0, py: 'md', order: 4 }, title),
         React.createElement(core_1.Text, { align: "justify" }, desc)));
 };

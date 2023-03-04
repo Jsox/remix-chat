@@ -1,26 +1,13 @@
-import moment from 'moment';
-import { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/ru';
+
+dayjs.locale('ru');
+dayjs.extend(relativeTime);
 
 export function useTime(dateString: number | string | Date) {
-    moment.locale('ru');
-
-    // const [timeAgo, settimeAgo] = useState(moment(dateString).fromNow());
-    const timeAgo = moment(dateString).fromNow();
-
-    // useEffect(() => {
-    // 	const interval = setInterval(() => {
-    // 		settimeAgo(moment(dateString).fromNow());
-    // 		// console.log(timeAgo);
-    // 	}, 45000);
-
-    // 	return () => {
-    // 		console.log('cleared interval');
-    // 		clearInterval(interval);
-    // 	};
-    // });
-
-    // return {
-    //     timeAgo,
-    // };
-    return moment(dateString).fromNow();
+    return {
+        fromNow: dayjs(dateString).fromNow(),
+        formatString: dayjs(dateString).format('D MMMM YYYYг. в HH:mm'),
+    };
 }

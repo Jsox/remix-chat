@@ -1,9 +1,10 @@
-import type { MantineThemeOverride } from '@mantine/core';
-
-export const theme: MantineThemeOverride = {
+"use strict";
+exports.__esModule = true;
+exports.theme = void 0;
+exports.theme = {
     // colorScheme: 'dark',
-	fontFamily: 'Ubuntu, Sans-serif, Amatic_SC',
-	// fontWeight: 400,
+    fontFamily: 'Ubuntu, Sans-serif, Amatic_SC',
+    // fontWeight: 400,
     headings: { fontFamily: 'Comfortaa, sans-serif', fontWeight: 600 },
     colors: {
         purple: [
@@ -41,6 +42,6 @@ export const theme: MantineThemeOverride = {
             '#550082',
             '#340050',
             '#14001f',
-        ],
-    },
+        ]
+    }
 };

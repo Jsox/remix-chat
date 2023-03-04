@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Form, useFetcher, useOutletContext } from '@remix-run/react';
-import { Alert, Flex, Title } from '@mantine/core';
+import { Alert, Flex } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { type MetaFunction } from '@remix-run/node';
@@ -11,8 +11,9 @@ import { HeroText } from 'app/components/HeroText/HeroText';
 import WaitingMessages from 'app/components/WaitingMessages';
 import { CreateProjectIndexArticle } from 'app/data/articles';
 import { ProjectCard } from 'app/components/ProjectCard/ProjectCard';
-import { Project } from '@prisma/client';
+import { type Project } from '@prisma/client';
 import PageTitle from 'app/components/PageTitle';
+import InfoMessage from 'app/components/InfoMessage';
 
 export const meta: MetaFunction = () => ({
     title: 'Сгенерировать блог с помощью ИИ в несколько кликов',
@@ -89,19 +90,23 @@ export default function GenerateProject() {
                 />
                 {!isIdle && <WaitingMessages />}
             </Form>
-            {!!projects.length && <PageTitle title={'Перейти к существующему проекту'} />}
-            <Flex gap="lg" justify="center" align="flex-start" direction="column" wrap="wrap">
-                {!!projects.length &&
-                    projects.map((pr: Project) => (
-                        <ProjectCard key={pr?.url} url={pr?.url} title={pr.title} created={pr.created} />
-                    ))}
-
-                {!projects.length &&
-                    <Alert mt={'xl'} w={'100%'} icon={<IconAlertCircle size={26} />} variant="outline">
-                        У Вас пока нет проектов... Создайте свой первый выше, введите название в форму.
-                    </Alert>}
-            </Flex>
-
+            {!!projects.length && (
+                <>
+                    <PageTitle title={'Перейти к существующему проекту'} />
+                    <Flex gap="lg" justify="center" align="flex-start" direction="column" wrap="wrap">
+                        {!!projects.length &&
+                            projects.map((pr: Project) => (
+                                <ProjectCard key={pr?.url} url={pr?.url} title={pr.title} created={pr.created} />
+                            ))}
+                    </Flex>
+                </>
+            )}
+            {!projects.length && (
+                <InfoMessage
+                    text="У Вас пока нет проектов... Создайте свой первый выше, введите название в форму."
+                    textAuthor="Аиша"
+                />
+            )}
             <Article
                 height={450}
                 title={'Генерация блога с помощью ИИ! Как? Почему?'}

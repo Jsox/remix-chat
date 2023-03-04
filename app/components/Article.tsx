@@ -1,6 +1,7 @@
-import { Container, createStyles, Title, Text, Spoiler, Divider, Box } from '@mantine/core';
+import { Container, createStyles, Title, Text, Spoiler, Divider, Box, TypographyStylesProvider } from '@mantine/core';
 import { useElementSize } from '@mantine/hooks';
 import { IconArticle } from '@tabler/icons';
+import { useColors } from 'app/hooks/useColors';
 
 interface IArticleProps {
     title: string;
@@ -26,7 +27,6 @@ const useStyles = createStyles((theme) => ({
         letterSpacing: -1,
         color: theme.colorScheme === 'dark' ? theme.white : theme.black,
         marginBottom: theme.spacing.xl,
-        fontFamily: `Greycliff CF, ${theme.fontFamily}`,
 
         '@media (max-width: 520px)': {
             fontSize: 28,
@@ -56,7 +56,7 @@ const useStyles = createStyles((theme) => ({
         '@media (min-width: 1900px)': {
             fontSize: theme.fontSizes.lg,
         },
-        'h*': {
+        '& h3, h2, h4': {
             letterSpacing: -1,
             color: theme.colorScheme === 'dark' ? theme.white : theme.black,
         },
@@ -64,6 +64,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function Article(props: IArticleProps) {
+    const { gradientTitleColor } = useColors();
     const { classes } = useStyles();
     const { title, html, height } = props;
     const { ref, width } = useElementSize();
@@ -77,9 +78,11 @@ export default function Article(props: IArticleProps) {
     };
 
     const content = (
-        <Text style={{ ...style }} ref={ref} className={classes.text}>
-            <div dangerouslySetInnerHTML={{ __html: html }}></div>
-        </Text>
+        <TypographyStylesProvider>
+            <Text style={{ ...style }} ref={ref} className={classes.text}>
+                <div dangerouslySetInnerHTML={{ __html: html }}></div>
+            </Text>
+        </TypographyStylesProvider>
     );
 
     return (
@@ -97,11 +100,11 @@ export default function Article(props: IArticleProps) {
                     labelPosition="center"
                     mb={'xl'}
                 />
-                <Title gradient={{ from: 'white', to: 'blue' }} variant={'gradient'} order={2} size={2} className={classes.title}>
+                <Title gradient={gradientTitleColor} variant={'gradient'} order={2} size={2} className={classes.title}>
                     {title}
                 </Title>
                 {height && (
-                    <Spoiler maxHeight={height} showLabel="Показать больше" hideLabel="Скрыть">
+                    <Spoiler maxHeight={height} showLabel="Показать больше" hideLabel="Свернуть">
                         {content}
                     </Spoiler>
                 )}

@@ -15,7 +15,7 @@ export default function Layout(props: any) {
     const [opened, { toggle }] = useDisclosure(false);
     const [scrollLocked, setScrollLocked] = useScrollLock();
 
-    const newNavBarLinks = navBarLinksAddon.concat(navBarLinks);
+    const newNavBarLinks = navBarLinks.concat(navBarLinksAddon);
     const { smallerLg } = useBreakpoints();
 
     useEffect(() => {

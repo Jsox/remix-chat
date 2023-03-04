@@ -14,6 +14,7 @@ exports.__esModule = true;
 var core_1 = require("@mantine/core");
 var hooks_1 = require("@mantine/hooks");
 var icons_1 = require("@tabler/icons");
+var useColors_1 = require("app/hooks/useColors");
 var useStyles = core_1.createStyles(function (theme) { return ({
     wrapper: {
         position: 'relative',
@@ -31,7 +32,6 @@ var useStyles = core_1.createStyles(function (theme) { return ({
         letterSpacing: -1,
         color: theme.colorScheme === 'dark' ? theme.white : theme.black,
         marginBottom: theme.spacing.xl,
-        fontFamily: "Greycliff CF, " + theme.fontFamily,
         '@media (max-width: 520px)': {
             fontSize: 28,
             textAlign: 'left'
@@ -60,13 +60,14 @@ var useStyles = core_1.createStyles(function (theme) { return ({
         '@media (min-width: 1900px)': {
             fontSize: theme.fontSizes.lg
         },
-        'h*': {
+        '& h3, h2, h4': {
             letterSpacing: -1,
             color: theme.colorScheme === 'dark' ? theme.white : theme.black
         }
     }
 }); });
 function Article(props) {
+    var gradientTitleColor = useColors_1.useColors().gradientTitleColor;
     var classes = useStyles().classes;
     var title = props.title, html = props.html, height = props.height;
     var _a = hooks_1.useElementSize(), ref = _a.ref, width = _a.width;
@@ -76,15 +77,16 @@ function Article(props) {
         MozColumnCount: columns,
         WebkitColumnCount: columns
     };
-    var content = (React.createElement(core_1.Text, { style: __assign({}, style), ref: ref, className: classes.text },
-        React.createElement("div", { dangerouslySetInnerHTML: { __html: html } })));
+    var content = (React.createElement(core_1.TypographyStylesProvider, null,
+        React.createElement(core_1.Text, { style: __assign({}, style), ref: ref, className: classes.text },
+            React.createElement("div", { dangerouslySetInnerHTML: { __html: html } }))));
     return (React.createElement(core_1.Container, { className: classes.wrapper, size: 'xl' },
         React.createElement(React.Fragment, null,
             React.createElement(core_1.Divider, { label: React.createElement(React.Fragment, null,
                     React.createElement(icons_1.IconArticle, { size: 12 }),
                     React.createElement(core_1.Box, { fs: 'md', mx: 5 }, "\u0441\u0442\u0430\u0442\u044C\u044F \u043F\u043E \u0442\u0435\u043C\u0435")), labelPosition: "center", mb: 'xl' }),
-            React.createElement(core_1.Title, { gradient: { from: 'white', to: 'blue' }, variant: 'gradient', order: 2, size: 2, className: classes.title }, title),
-            height && (React.createElement(core_1.Spoiler, { maxHeight: height, showLabel: "\u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C \u0431\u043E\u043B\u044C\u0448\u0435", hideLabel: "\u0421\u043A\u0440\u044B\u0442\u044C" }, content)),
+            React.createElement(core_1.Title, { gradient: gradientTitleColor, variant: 'gradient', order: 2, size: 2, className: classes.title }, title),
+            height && (React.createElement(core_1.Spoiler, { maxHeight: height, showLabel: "\u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C \u0431\u043E\u043B\u044C\u0448\u0435", hideLabel: "\u0421\u0432\u0435\u0440\u043D\u0443\u0442\u044C" }, content)),
             !height && content)));
 }
 exports["default"] = Article;

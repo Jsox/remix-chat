@@ -13,6 +13,7 @@ import { type User } from '@prisma/client';
 import { NothingFoundBackground } from './components/NothingFoundBackground/NothingFoundBackground';
 import { ServerError } from './components/ServerError/ServerError';
 import { ServerOverload } from './components/ServerOverload/ServerOverload';
+import { CustomFonts } from './fonts/CustomFonts';
 
 export const meta: MetaFunction = () => ({
     charset: 'utf-8',
@@ -89,6 +90,7 @@ export function RootLayout(props: PropsWithChildren) {
     return (
         <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
             <MantineProvider theme={{ colorScheme, ...theme }} withGlobalStyles withNormalizeCSS>
+                <CustomFonts />
                 <NotificationsProvider position="top-right" limit={3}>
                     <html lang="ru">
                         <head>

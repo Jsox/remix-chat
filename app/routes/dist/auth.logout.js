@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -47,27 +36,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var core_1 = require("@mantine/core");
-var react_1 = require("@remix-run/react");
-var icons_1 = require("@tabler/icons");
-function LogOutButton(props) {
-    var _this = this;
-    var setUser = react_1.useOutletContext().setUser;
-    // const fetcher = useFetcher();
-    var logOut = function () { return __awaiter(_this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            // await fetcher.submit({ do: 'logout' }, { method: 'post', action: '/auth/logout' });
-            setUser(null);
-            return [2 /*return*/];
-        });
-    }); };
-    return (React.createElement(core_1.Button, __assign({ component: react_1.NavLink, to: '/auth/logout', radius: 'lg', onClick: logOut }, props, { leftIcon: React.createElement(icons_1.IconLogout, { size: 16 }), sx: function (theme) { return ({
-            transition: 'all .2s ease-in-out',
-            backgroundColor: theme.colors.darkBlue[theme.colorScheme === 'dark' ? 4 : 1],
-            color: '#fff',
-            '&:hover': {
-                backgroundColor: theme.colors.darkBlue[theme.colorScheme === 'dark' ? 5 : 2]
+exports.loader = void 0;
+var node_1 = require("@remix-run/node");
+var auth_server_1 = require("app/services/auth.server");
+function loader(_a) {
+    var request = _a.request;
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0: return [4 /*yield*/, auth_server_1.authenticator.logout(request, { redirectTo: process.env.REDIRECT_AFTER_LOGOUT || '/' })];
+                case 1:
+                    _b.sent();
+                    return [2 /*return*/, node_1.redirect(process.env.REDIRECT_AFTER_LOGOUT || '/')];
             }
-        }); } }), "\u0412\u044B\u0439\u0442\u0438"));
+        });
+    });
 }
-exports["default"] = LogOutButton;
+exports.loader = loader;

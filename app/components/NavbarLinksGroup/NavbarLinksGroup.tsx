@@ -19,7 +19,7 @@ const useStyles = createStyles((theme) => ({
     },
 
     link: {
-        fontWeight: 500,
+        fontWeight: 400,
         display: 'block',
         textDecoration: 'none',
         padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,

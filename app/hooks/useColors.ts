@@ -4,6 +4,17 @@ export function useColors() {
 	const theme = useMantineTheme();
 	const { colorScheme } = useMantineColorScheme();
 
+	const gradientTitleColor = {
+        from: colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.blue[8],
+        to: colorScheme === 'dark' ? theme.colors.blue[2] : theme.colors.blue[9],
+        deg: 180,
+    };
+	const gradientTitle = {
+        variant: 'gradient',
+        gradient: gradientTitleColor,
+    };
+	
+	const contrastColor = colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[9];
 	const primaryTextColor = colorScheme === 'dark' ? theme.colors.white : theme.colors.white;
     const primaryBackgroundColor = colorScheme === 'dark' ? theme.colors.violet[8] : theme.colors.violet[6];
 
@@ -15,6 +26,9 @@ export function useColors() {
 
 	const header = colorScheme === 'dark' ? theme.colors.darkBlue[8] : theme.colors.darkBlue[2];
 	return {
+		contrastColor,
+		gradientTitleColor,
+		gradientTitle,
 		primaryTextColor,
 		header,
 		textColor,

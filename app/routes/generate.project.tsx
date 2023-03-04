@@ -1,4 +1,4 @@
-import { Stepper, Title, Text } from '@mantine/core';
+import { Stepper, Title, Text, Divider } from '@mantine/core';
 import { json, redirect, type LoaderArgs } from '@remix-run/node';
 import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react';
 import LoginButtons from 'app/components/auth/LoginButtons';
@@ -9,13 +9,14 @@ import { useEffect } from 'react';
 import { prismaClient } from 'app/lib/Prisma';
 import type { Project, Section, Topic } from '@prisma/client';
 import { IconBulb } from '@tabler/icons';
+import { useColors } from 'app/hooks/useColors';
 
 // export async function action({ request }) {
 //     const user = await auth(request);
 //     if (!user) return redirect('/generate/project', 401);
 // }
 export async function loader({ request, params }: LoaderArgs) {
-    console.log({ params });
+   
     const { projectSlug, sectionSlug } = params;
 
     const user = await auth(request);
@@ -68,8 +69,7 @@ export default function ProjectLayout() {
     const context: Record<string, any> = useOutletContext();
     const { user, setAside } = context;
     const { projects, sections, topics, projectSlug, sectionSlug } = useLoaderData();
-    // console.log({ projects, user });
-    const { smallerSm, isXl } = useBreakpoints();
+
     let active: number = 0;
     if (!user) {
         active = 0;
@@ -81,7 +81,8 @@ export default function ProjectLayout() {
     const aside = (
         <Stepper
             mt={'lg'}
-            size={smallerSm ? 'xs' : isXl ? 'md' : 'sm'}
+            size={'md'}
+            // size={smallerSm ? 'sm' : isXl ? 'md' : 'sm'}
             active={active}
             orientation="vertical"
             allowNextStepsSelect={false}
@@ -89,6 +90,10 @@ export default function ProjectLayout() {
         >
             <Stepper.Step label="Вход" description="Авторизуйтесь">
                 <LoginButtons />
+                <StepperDesc
+                    title="Авторизация"
+                    desc="Войдите с помощью соц.сетей и начните генерировать статьи с помощью ИИ. Регистрация проста и бесплатна!"
+                />
             </Stepper.Step>
             <Stepper.Step label="Проект" description="Назовите проект">
                 <StepperDesc
@@ -128,11 +133,14 @@ export default function ProjectLayout() {
     );
 }
 
-export const StepperDesc = ({ title, desc }: Record<string, string>) => (
-    <>
-        <Title align="center" m={0} py={'md'} order={4}>
-            <IconBulb color={'yellow'} /> {title}
-        </Title>
-        <Text align="justify">{desc}</Text>
-    </>
-);
+export const StepperDesc = ({ title, desc }: Record<string, string>) => {
+    const {gradientTitleColor} = useColors()
+    return (
+        <>
+            <Divider mt={'lg'} label={<IconBulb size={24} />} labelPosition={'center'} />
+            <Title fw={600} gradient={gradientTitleColor} variant={'gradient'} align="center" m={0} py={'md'} order={4}>
+                {title}
+            </Title>
+            <Text align="justify">{desc}</Text>
+        </>
+    );};

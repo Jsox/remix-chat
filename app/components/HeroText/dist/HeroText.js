@@ -28,10 +28,10 @@ var Dots_1 = require("./Dots");
 var useStyles = core_1.createStyles(function (theme) { return ({
     wrapper: {
         position: 'relative',
-        paddingTop: 100,
-        paddingBottom: 40,
+        paddingTop: 60,
+        paddingBottom: 30,
         '@media (max-width: 755px)': {
-            paddingTop: 40,
+            paddingTop: 30,
             paddingBottom: 30
         }
     },
@@ -57,18 +57,18 @@ var useStyles = core_1.createStyles(function (theme) { return ({
         letterSpacing: -1,
         color: theme.colorScheme === 'dark' ? theme.white : theme.black,
         marginBottom: theme.spacing.xs,
-        fontFamily: "Greycliff CF, " + theme.fontFamily,
+        // fontFamily: `Greycliff CF, ${theme.fontFamily}`,
         '@media (max-width: 520px)': {
             fontSize: 28
         }
     },
     highlight: {
-        color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6]
+        color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 9]
     },
     description: {
         textAlign: 'center',
+        color: theme.colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.gray[8],
         '@media (max-width: 520px)': {
-            // textAlign: 'left',
             fontSize: theme.fontSizes.md
         }
     },

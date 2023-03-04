@@ -1,15 +1,15 @@
-import { createStyles, Title, Text, Button, Container } from '@mantine/core';
-import { type ReactNode } from 'react';
+import { createStyles, Title, Text, Container } from '@mantine/core';
+import { type ReactElement, type ReactNode } from 'react';
 import { Dots } from './Dots';
 
 const useStyles = createStyles((theme) => ({
     wrapper: {
         position: 'relative',
-        paddingTop: 100,
-        paddingBottom: 40,
+        paddingTop: 60,
+        paddingBottom: 30,
 
         '@media (max-width: 755px)': {
-            paddingTop: 40,
+            paddingTop: 30,
             paddingBottom: 30,
         },
     },
@@ -40,7 +40,7 @@ const useStyles = createStyles((theme) => ({
         letterSpacing: -1,
         color: theme.colorScheme === 'dark' ? theme.white : theme.black,
         marginBottom: theme.spacing.xs,
-        fontFamily: `Greycliff CF, ${theme.fontFamily}`,
+        // fontFamily: `Greycliff CF, ${theme.fontFamily}`,
 
         '@media (max-width: 520px)': {
             fontSize: 28,
@@ -49,14 +49,13 @@ const useStyles = createStyles((theme) => ({
     },
 
     highlight: {
-        color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6],
+        color: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 9],
     },
 
     description: {
         textAlign: 'center',
-
+        color: theme.colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.gray[8],
         '@media (max-width: 520px)': {
-            // textAlign: 'left',
             fontSize: theme.fontSizes.md,
         },
     },
@@ -89,10 +88,10 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface IOpts {
-    titleStart: string;
+    titleStart: string | ReactElement;
     titleHighlighted: string;
     titleEnd: string;
-    description: string;
+    description: string | ReactElement;
     controls?: ReactNode | null;
 }
 
@@ -108,7 +107,7 @@ export function HeroText(opts: IOpts) {
             <Dots className={classes.dots} style={{ right: 0, top: 60 }} />
 
             <div className={classes.inner} {...props}>
-                <Title className={classes.title}>
+                <Title  className={classes.title}>
                     {titleStart}{' '}
                     <Text component="span" className={classes.highlight} inherit>
                         {titleHighlighted}
