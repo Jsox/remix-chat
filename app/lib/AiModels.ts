@@ -12,7 +12,10 @@ export const AiModels = (query: string, model: string = 'text-davinci-003', gene
         },
         generateBlogSections: {
             model: model,
-            prompt: `Expand the blog Theme in to high level blog sections. Blog Theme: ${query}\nGenerate ${generateNum} pcs.\nAnswer in JSON array:\n
+            prompt: `Expand the blog Theme in to high level blog sections.
+            Blog Theme: ${query}
+            Generate ${generateNum} blog sections.
+            Answer in JSON array:\n
                     [{
                         "sectionTitle": "",
                         "sectionMetaTitle": "",

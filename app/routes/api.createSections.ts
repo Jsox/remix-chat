@@ -1,7 +1,11 @@
-import { json, type ActionArgs } from '@remix-run/node';
+import { json, redirect, type ActionArgs } from '@remix-run/node';
 import { Generator } from 'app/lib/ai-blog.server';
 import clearTextForJson from 'app/lib/clearTextForJson';
 import auth from 'app/services/auth.server';
+
+export async function loader() {
+    throw redirect('/', 404)
+};
 
 export async function action({ request }: ActionArgs) {
     const user = await auth(request);

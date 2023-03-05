@@ -7,9 +7,14 @@ import { useColors } from '../hooks/useColors';
 import { useEffect } from 'react';
 import { useOutletContext } from '@remix-run/react';
 import useBreakpoints from '../hooks/useBreakpoint';
+import { type LinksFunction } from '@remix-run/node';
 
 export default function Layout(props: any) {
-    const { navBarLinksAddon = [], aside = [], user } = useOutletContext() || {};
+
+
+    // console.log({ state });
+
+    const { navBarLinksAddon = [], aside = [], user }: any = useOutletContext() || {};
 
     const { bodyStyles } = useColors();
     const [opened, { toggle }] = useDisclosure(false);
@@ -22,9 +27,14 @@ export default function Layout(props: any) {
         setScrollLocked(opened);
     }, [opened]);
 
+    // useEffect(() => {
+    //     console.log({ states });
+    // }, [states]);
+
     const asideContent = Array.isArray(aside) ? aside.map((c, i) => <div key={i}>{c}</div>) : null;
 
     return (
+
         <AppShell
             styles={{
                 main: { ...bodyStyles },

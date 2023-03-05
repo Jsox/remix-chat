@@ -1,8 +1,26 @@
-import { json, type LoaderArgs, type MetaFunction } from '@remix-run/node';
+import {
+    json,
+    type LinksFunction,
+    type LoaderArgs,
+    type MetaFunction,
+} from '@remix-run/node';
 import { type PropsWithChildren, useState } from 'react';
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch, useLoaderData } from '@remix-run/react';
+import {
+    Links,
+    LiveReload,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    useCatch,
+    useLoaderData,
+} from '@remix-run/react';
 import type { ColorScheme } from '@mantine/core';
-import { ColorSchemeProvider, createEmotionCache, MantineProvider } from '@mantine/core';
+import {
+    ColorSchemeProvider,
+    createEmotionCache,
+    MantineProvider,
+} from '@mantine/core';
 import { StylesPlaceholder } from '@mantine/remix';
 import { NotificationsProvider } from '@mantine/notifications';
 import { theme } from './theme';
@@ -15,6 +33,9 @@ import { ServerError } from './components/ServerError/ServerError';
 import { ServerOverload } from './components/ServerOverload/ServerOverload';
 import { CustomFonts } from './fonts/CustomFonts';
 
+import ProgressBar from './components/ProgressBar';
+// import PWALinks from "./components/PWALinks";
+
 export const meta: MetaFunction = () => ({
     charset: 'utf-8',
     viewport: 'width=device-width,initial-scale=1',
@@ -22,13 +43,12 @@ export const meta: MetaFunction = () => ({
 
 createEmotionCache({ key: 'mantine' });
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request, context }: LoaderArgs) {
+    console.log({ contextInRoot: context });
     const user = (await authenticator.isAuthenticated(request)) || null;
-
-    return json({
-        userLoader: user,
-    });
+    return json({ userLoader: user });
 }
+
 export function CatchBoundary() {
     const caught = useCatch();
     switch (caught.status) {
@@ -56,15 +76,14 @@ export function CatchBoundary() {
                     </Layout>
                 </RootLayout>
             );
-
         default:
             break;
     }
     return (
         <html>
             <head>
-                <title>Oops!</title>
-                <Meta />
+                <title>Упс!</title> <Meta />
+                {/* <PWALinks /> */}
                 <Links />
             </head>
             <body>
@@ -76,20 +95,27 @@ export function CatchBoundary() {
         </html>
     );
 }
-
 export function RootLayout(props: PropsWithChildren) {
     const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
         key: 'color-scheme',
         defaultValue: 'dark',
     });
-
     const toggleColorScheme = (value?: ColorScheme) => {
-        let current: ColorScheme = value || colorScheme === 'dark' ? 'light' : 'dark';
+        let current: ColorScheme =
+            value || colorScheme === 'dark' ? 'light' : 'dark';
         setColorScheme(current);
     };
     return (
-        <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-            <MantineProvider theme={{ colorScheme, ...theme }} withGlobalStyles withNormalizeCSS>
+        <ColorSchemeProvider
+            colorScheme={colorScheme}
+            toggleColorScheme={toggleColorScheme}
+        >
+            <MantineProvider
+                theme={{ colorScheme, ...theme }}
+                withGlobalStyles
+                withNormalizeCSS
+            >
+                <ProgressBar />
                 <CustomFonts />
                 <NotificationsProvider position="top-right" limit={3}>
                     <html lang="ru">
@@ -110,7 +136,9 @@ export function RootLayout(props: PropsWithChildren) {
         </ColorSchemeProvider>
     );
 }
-
+// export const links: LinksFunction = () => {
+//     return [{ rel: "manifest", href: "/resources/manifest.webmanifest" }];
+// };
 export default function App() {
     const { userLoader } = useLoaderData();
     const [user, setUser] = useState<User | null>(userLoader);
@@ -119,7 +147,16 @@ export default function App() {
 
     return (
         <RootLayout>
-            <Outlet context={{ user, setUser, navBarLinksAddon, setNavBarLinksAddon, aside, setAside }} />
+            <Outlet
+                context={{
+                    user,
+                    setUser,
+                    navBarLinksAddon,
+                    setNavBarLinksAddon,
+                    aside,
+                    setAside,
+                }}
+            />
         </RootLayout>
     );
 }

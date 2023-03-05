@@ -10,6 +10,7 @@ export function SwitchToggle() {
     return (
         <Group position="center" my="xl">
             <ActionIcon
+                aria-label={`Переключить тему оформдения на ${ruColorSchemeName}`}
                 onClick={() => toggleColorScheme()}
                 size="lg"
                 sx={(theme) => ({

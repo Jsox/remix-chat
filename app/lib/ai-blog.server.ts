@@ -87,7 +87,7 @@ export class Generator {
         }
     }
 
-    async generateBlogSections(): Promise<CreateCompletionResponse | Record<string, string>> {
+    async generateBlogSections(): Promise<CreateCompletionResponse | { error: string }> {
         try {
             this.job = 'generateBlogSections';
             this.queryModel = this.settings[this.job];

@@ -12,7 +12,6 @@ const useStyles = createStyles((theme) => ({
         background: theme.colorScheme === 'dark' ? theme.colors.darkBlue[7] : theme.colors.gray[0],
         width: { sm: 200, lg: 300 },
     },
-
     section: {
         // marginLeft: -theme.spacing.md,
         // marginRight: -theme.spacing.md,
@@ -20,14 +19,11 @@ const useStyles = createStyles((theme) => ({
         //     marginLeft: 0,
         //     marginRight: 0,
         // },
-
         marginBottom: theme.spacing.md,
-
         '&:not(:last-of-type)': {
             borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.darkBlue[6] : theme.colors.gray[1]}`,
         },
     },
-
     searchCode: {
         fontWeight: 700,
         fontSize: 10,
@@ -43,10 +39,10 @@ const useStyles = createStyles((theme) => ({
         borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
     },
 
-    links: {
-        // marginLeft: -theme.spacing.md,
-        // marginRight: -theme.spacing.md,
-    },
+    // links: {
+    //     // marginLeft: -theme.spacing.md,
+    //     // marginRight: -theme.spacing.md,
+    // },
 
     linksInner: {
         paddingTop: theme.spacing.xl,

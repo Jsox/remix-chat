@@ -1,6 +1,6 @@
 import {
   UnstyledButton,
-  UnstyledButtonProps,
+  type UnstyledButtonProps,
   Group,
   Avatar,
   Text,
@@ -34,7 +34,7 @@ export function UserButton({ image, name, email, icon, ...others }: UserButtonPr
   return (
     <UnstyledButton className={classes.user} {...others}>
       <Group>
-        <Avatar src={image} radius="xl" />
+        <Avatar alt={`Пользователь ${name}`} src={image} radius="xl" />
 
         <div style={{ flex: 1 }}>
           <Text size="sm" weight={500}>

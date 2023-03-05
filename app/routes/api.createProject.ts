@@ -3,6 +3,10 @@ import { json, redirect, type ActionArgs } from '@remix-run/node';
 import auth from 'app/services/auth.server';
 import { filterAndTranslateTo } from '../lib/filterAndTranslateTo';
 
+export async function loader() {
+    throw redirect('/', 404)
+};
+
 export async function action({ request }: ActionArgs) {
     const user = await auth(request);
     if (!user?.id) {

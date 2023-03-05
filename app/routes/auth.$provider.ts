@@ -6,10 +6,10 @@ export let loader = () => {
     throw redirect(process.env.REDIRECT_FAIL || '/');
 };
 
-export let action = ({ request, params }: ActionArgs) => {
+export let action = ({ request, params, context }: ActionArgs) => {
     const { provider } = params;
     if (!provider) {
         throw redirect(process.env.REDIRECT_FAIL || '/');
     }
-    return authenticator.authenticate(provider, request);
+    return authenticator.authenticate(provider, request, context);
 };

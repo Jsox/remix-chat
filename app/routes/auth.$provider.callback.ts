@@ -1,7 +1,7 @@
 import { redirect, type LoaderArgs } from '@remix-run/node';
 import { authenticator } from 'app/services/auth.server';
 
-export let loader = ({ request, params }: LoaderArgs) => {
+export let loader = ({ request, params, context }: LoaderArgs) => {
     const { provider } = params;
 
     if (!provider) {
@@ -11,5 +11,6 @@ export let loader = ({ request, params }: LoaderArgs) => {
     return authenticator.authenticate(provider, request, {
         successRedirect: process.env.REDIRECT_AFTER_LOGIN || '/',
         failureRedirect: process.env.REDIRECT_FAIL || '/',
+        context
     });
 };

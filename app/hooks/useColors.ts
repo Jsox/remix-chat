@@ -6,8 +6,8 @@ export function useColors() {
 
 	const gradientTitleColor = {
         from: colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.blue[8],
-        to: colorScheme === 'dark' ? theme.colors.blue[2] : theme.colors.blue[9],
-        deg: 180,
+        to: colorScheme === 'dark' ? theme.colors.blue[3] : theme.colors.blue[9],
+        // deg: 180,
     };
 	const gradientTitle = {
         variant: 'gradient',

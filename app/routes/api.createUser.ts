@@ -1,13 +1,17 @@
-import { type ActionArgs, json } from '@remix-run/node';
+import { type ActionArgs, json, redirect } from '@remix-run/node';
 import { userGetOrCreate } from 'app/lib/Prisma';
 
+export async function loader() {
+    throw redirect('/', 404)
+};
+
 export async function action({ request }: ActionArgs) {
-    const fingerprint: any = (await request.formData()).get('getUserData')?.toString();
+    const fingerprint: string = (await request.formData()).get('getUserData')?.toString() || '';
     if (!fingerprint) return json({ error: 'нет fp', ok: false });
     try {
         const user = await userGetOrCreate({ fingerprint });
         return json(user);
-    } catch (error: {}) {
+    } catch (error: any) {
         return json({ error: error.message, ok: false });
     }
 }

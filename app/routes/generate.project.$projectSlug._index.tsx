@@ -60,7 +60,7 @@ export default function ProjectPage() {
             };
         });
         temp.push({
-            label: 'Проекты',
+            label: 'Ваши проекты',
             icon: IconListDetails,
             links,
             initiallyOpened: true,

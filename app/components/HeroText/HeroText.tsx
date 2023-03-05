@@ -5,13 +5,13 @@ import { Dots } from './Dots';
 const useStyles = createStyles((theme) => ({
     wrapper: {
         position: 'relative',
-        paddingTop: 60,
-        paddingBottom: 30,
+        // paddingTop: 60,
+        // paddingBottom: 30,
 
-        '@media (max-width: 755px)': {
-            paddingTop: 30,
-            paddingBottom: 30,
-        },
+        // '@media (max-width: 755px)': {
+        //     paddingTop: 30,
+        //     paddingBottom: 30,
+        // },
     },
 
     inner: {
@@ -100,7 +100,7 @@ export function HeroText(opts: IOpts) {
     const { classes } = useStyles();
 
     return (
-        <Container className={classes.wrapper} size={1400}>
+        <Container pt={{ base: 20, sm: 40, md: 50, lg: 60 }} pb={{ base: 20 }} className={classes.wrapper} size={1400}>
             <Dots className={classes.dots} style={{ left: 0, top: 0 }} />
             <Dots className={classes.dots} style={{ left: 60, top: 0 }} />
             <Dots className={classes.dots} style={{ left: 0, top: 140 }} />

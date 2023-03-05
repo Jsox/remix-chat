@@ -11,8 +11,6 @@ export default function handleRequest(
     responseHeaders: Headers,
     remixContext: EntryContext
 ) {
-    // let user = authenticator.isAuthenticated(request);
-    // remixContext.user = user;
     let markup = renderToString(<RemixServer context={remixContext} url={request.url} />);
     responseHeaders.set('Content-Type', 'text/html');
 
