@@ -3,7 +3,7 @@ import auth from 'app/services/auth.server';
 import { AI21 } from '../lib/AI21';
 
 export async function loader() {
-    throw redirect('/', 404)
+    throw json(null, 404);
 };
 
 export async function action({ request }: ActionArgs) {

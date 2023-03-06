@@ -2,21 +2,22 @@ import { Stepper, Title, Text, Divider } from '@mantine/core';
 import { json, redirect, type LoaderArgs } from '@remix-run/node';
 import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react';
 import LoginButtons from 'app/components/auth/LoginButtons';
-import useBreakpoints from 'app/hooks/useBreakpoint';
 import Layout from 'app/layouts/Layout';
 import auth from 'app/services/auth.server';
-import { useEffect } from 'react';
-import { prismaClient } from 'app/lib/Prisma';
+import { useEffect, useState } from 'react';
+import { getProjects, prismaClient } from 'app/lib/Prisma';
 import type { Project, Section, Topic } from '@prisma/client';
-import { IconBulb } from '@tabler/icons';
+import { IconBulb, IconListDetails, IconStack2, IconStackPush } from '@tabler/icons';
 import { useColors } from 'app/hooks/useColors';
+import { TSetNavBarOptions } from 'app/types';
+import BreadCrumbs from 'app/components/BreadCrumbs';
 
 // export async function action({ request }) {
 //     const user = await auth(request);
 //     if (!user) return redirect('/generate/project', 401);
 // }
 export async function loader({ request, params }: LoaderArgs) {
-   
+
     const { projectSlug, sectionSlug } = params;
 
     const user = await auth(request);
@@ -26,17 +27,8 @@ export async function loader({ request, params }: LoaderArgs) {
     let sections: Section[] = [];
     let topics: Topic[] = [];
     if (user && user.id) {
-        projects = await prismaClient.project.findMany({
-            where: {
-                User: {
-                    id: user.id,
-                },
-            },
-            include: {
-                Sections: true,
-                Topics: true,
-            },
-        });
+        projects = await getProjects(user.id)
+
         sections = await prismaClient.section.findMany({
             where: {
                 User: {
@@ -64,11 +56,57 @@ export async function loader({ request, params }: LoaderArgs) {
         sectionSlug,
     });
 }
-
+interface IProjectLayoutLoaderProps {
+    projects: Project[];
+    sections: Section[];
+    topics: Topic[];
+    projectSlug: string;
+    sectionSlug: string;
+}
 export default function ProjectLayout() {
     const context: Record<string, any> = useOutletContext();
-    const { user, setAside } = context;
-    const { projects, sections, topics, projectSlug, sectionSlug } = useLoaderData();
+    const { user, setAside, setNavBarLinksAddon } = context;
+    const { projects, sections, topics, projectSlug, sectionSlug }: IProjectLayoutLoaderProps = useLoaderData();
+
+    let temp: TSetNavBarOptions = [];
+    if (projects?.length) {
+        const links = projects.map((project: Project) => {
+            return {
+                label: project.title,
+                link: '/generate/project/' + project.url,
+            };
+        });
+        temp.push({
+            label: 'Ваши проекты',
+            icon: IconStackPush,
+            links,
+            initiallyOpened: !sectionSlug,
+        });
+    }
+    // let temp2 = []
+    // if (projectSlug && projects?.length) {
+    //     let currentProject = projects.filter(pr => pr.url === projectSlug)
+    //     //&& currentProject.Sections.length > 0
+    //     if (currentProject.length) {
+    //         temp2 = [{
+    //             label: 'Разделы Проекта',
+    //             icon: IconStack2,
+    //             initiallyOpened: true,
+    //             links: [{
+    //                 link: '/',
+    //                 label: currentProject[0].title
+    //             }]
+    //         }]
+    //         temp = temp.concat(temp2)
+    //         // temp2 = currentProject[0].Sections.map(sec => ({
+
+    //         // }))
+    //     }
+    // }
+    useEffect(() => {
+        setNavBarLinksAddon(temp);
+    }, []);
+
 
     let active: number = 0;
     if (!user) {
@@ -86,7 +124,7 @@ export default function ProjectLayout() {
             active={active}
             orientation="vertical"
             allowNextStepsSelect={false}
-            // color={'red'}
+        // color={'red'}
         >
             <Stepper.Step label="Вход" description="Авторизуйтесь">
                 <LoginButtons />
@@ -122,9 +160,12 @@ export default function ProjectLayout() {
             </Stepper.Completed>
         </Stepper>
     );
+
     useEffect(() => {
         setAside([aside]);
-    });
+    }, []);
+
+
 
     return (
         <Layout>
@@ -134,7 +175,7 @@ export default function ProjectLayout() {
 }
 
 export const StepperDesc = ({ title, desc }: Record<string, string>) => {
-    const {gradientTitleColor} = useColors()
+    const { gradientTitleColor } = useColors()
     return (
         <>
             <Divider mt={'lg'} label={<IconBulb size={24} />} labelPosition={'center'} />
@@ -143,4 +184,5 @@ export const StepperDesc = ({ title, desc }: Record<string, string>) => {
             </Title>
             <Text align="justify">{desc}</Text>
         </>
-    );};
+    );
+};

@@ -14,6 +14,7 @@ import { ProjectCard } from 'app/components/ProjectCard/ProjectCard';
 import { type Project } from '@prisma/client';
 import PageTitle from 'app/components/PageTitle';
 import InfoMessage from 'app/components/InfoMessage';
+import BreadCrumbs from 'app/components/BreadCrumbs';
 
 export const meta: MetaFunction = () => ({
     title: 'Сгенерировать блог с помощью ИИ в несколько кликов',
@@ -23,13 +24,10 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function GenerateProject() {
-    const { setNavBarLinksAddon, projects }: any = useOutletContext();
+    const { projects, setBreadCrumbs }: any = useOutletContext()
+
     const [newProject, createNewProject] = useInputState('');
     const newProjectFetcher = useFetcher();
-
-    useEffect(() => {
-        setNavBarLinksAddon([]);
-    });
 
     const isIdle = newProjectFetcher.state === 'idle';
 
@@ -65,6 +63,23 @@ export default function GenerateProject() {
         }
     }, [newProjectFetcher.data]);
 
+    const bci = [
+        {
+            title: 'Главная',
+            url: '/'
+        }, {
+            title: 'Сгенерировать контент',
+            url: '/generate'
+        }, {
+            title: 'Проект Блога',
+            url: '/generate/project'
+        }
+    ]
+
+    useEffect(() => {
+        setBreadCrumbs(bci)
+    }, []);
+
     return (
         <>
             <HeroText
@@ -78,7 +93,9 @@ export default function GenerateProject() {
             <Form onSubmit={submitNewProject}>
                 <CreateProjectForm
                     error={newProjectFetcher?.data?.error}
-                    description={'Например: "Генерация блога с помощью ИИ", "Производство мороженого"'}
+                    description={
+                        'Например: "Генерация блога с помощью ИИ", "Производство мороженого"'
+                    }
                     descriptionProps={{
                         align: 'center',
                         pb: 'xs',
@@ -93,10 +110,16 @@ export default function GenerateProject() {
             {!!projects.length && (
                 <>
                     <PageTitle title={'Перейти к существующему проекту'} />
-                    <Flex gap="lg" justify="center" align="flex-start" direction="column" wrap="wrap">
-                        {!!projects.length &&
+                    <Flex
+                        gap="lg"
+                        justify="center"
+                        align="flex-start"
+                        direction="column"
+                        wrap="wrap"
+                    >
+                        {
                             projects.map((pr: Project) => (
-                                <ProjectCard key={pr?.url} url={pr?.url} title={pr.title} created={pr.created} />
+                                <ProjectCard key={pr?.url} project={pr} />
                             ))}
                     </Flex>
                 </>

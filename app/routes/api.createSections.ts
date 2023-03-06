@@ -4,7 +4,7 @@ import clearTextForJson from 'app/lib/clearTextForJson';
 import auth from 'app/services/auth.server';
 
 export async function loader() {
-    throw redirect('/', 404)
+    throw json(null, 404);
 };
 
 export async function action({ request }: ActionArgs) {

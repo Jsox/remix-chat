@@ -14,39 +14,44 @@ export function CustomFonts() {
                 {
                     '@font-face': {
                         fontFamily: 'Ubuntu',
-                        src: `url('${bold}') format("truetype")`,
+                        src: `local('Ubuntu'), url('${bold}') format("truetype")`,
                         fontWeight: 700,
                         fontStyle: 'bold',
+                        fontDisplay: 'swap'
                     },
                 },
                 {
                     '@font-face': {
                         fontFamily: 'Ubuntu',
-                        src: `url('${regular}') format("truetype")`,
+                        src: `local('Ubuntu'), url('${regular}') format("truetype")`,
                         fontWeight: 400,
                         fontStyle: 'normal',
+                        fontDisplay: 'swap'
                     },
                 },
                 {
                     '@font-face': {
                         fontFamily: 'Ubuntu',
-                        src: `url('${light}') format("truetype")`,
+                        src: `local('Ubuntu'), url('${light}') format("truetype")`,
                         fontWeight: 300,
                         fontStyle: 'light',
+                        fontDisplay: 'swap'
                     },
                 },
                 {
                     '@font-face': {
                         fontFamily: 'Ubuntu',
-                        src: `url('${medium}') format("truetype")`,
+                        src: `local('Ubuntu'), url('${medium}') format("truetype")`,
                         fontWeight: 500,
                         fontStyle: 'medium',
+                        fontDisplay: 'swap'
                     },
                 },
                 {
                     '@font-face': {
                         fontFamily: 'Comfortaa',
-                        src: `url('${comfortaa}') format("truetype")`,
+                        src: `local('Comfortaa'), url('${comfortaa}') format("truetype")`,
+                        fontDisplay: 'swap'
                     },
                 },
             ]}

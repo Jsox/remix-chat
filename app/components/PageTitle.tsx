@@ -7,14 +7,21 @@ export default function PageTitle({ title }: any) {
     const { gradientTitleColor } = useColors();
     const { isXs } = useBreakpoints()
     return (
-        <Group w={'100%'} mt={{ base: 20, sm: 40, lg: 55 }} mb={30} pt={'xl'} pb={'sm'}>
+        <Group style={{
+            position: 'relative',
+            justifyContent: 'center',
+        }} w={'100%'} mt={{ base: 20, sm: 40, lg: 55 }} mb={30} pt={'xl'} pb={'sm'}>
             {/* <Divider py={'sm'} /> */}
-            <IconGripVertical width={'10%'} />
+            <IconGripVertical style={{
+                position: 'absolute',
+                left: 0,
+                top: '40%'
+            }} />
             <Title
-                w={'85%'}
                 gradient={gradientTitleColor}
                 variant={'gradient'}
                 order={2}
+                pl={'xl'}
                 size={isXs ? 20 : 26}
                 align={'center'}
                 fw={700}

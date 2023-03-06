@@ -4,7 +4,7 @@ import {
     type LoaderArgs,
     type MetaFunction,
 } from '@remix-run/node';
-import { type PropsWithChildren, useState } from 'react';
+import { type PropsWithChildren, useState, type ReactElement } from 'react';
 import {
     Links,
     LiveReload,
@@ -44,9 +44,10 @@ export const meta: MetaFunction = () => ({
 createEmotionCache({ key: 'mantine' });
 
 export async function loader({ request, context }: LoaderArgs) {
-    console.log({ contextInRoot: context });
+    const { fingerprint: expressFingerprint } = context;
+    console.log({ expressFingerprint });
     const user = (await authenticator.isAuthenticated(request)) || null;
-    return json({ userLoader: user });
+    return json({ userLoader: user, expressFingerprint });
 }
 
 export function CatchBoundary() {
@@ -140,10 +141,11 @@ export function RootLayout(props: PropsWithChildren) {
 //     return [{ rel: "manifest", href: "/resources/manifest.webmanifest" }];
 // };
 export default function App() {
-    const { userLoader } = useLoaderData();
+    const { userLoader, expressFingerprint } = useLoaderData();
     const [user, setUser] = useState<User | null>(userLoader);
     const [navBarLinksAddon, setNavBarLinksAddon] = useState([]);
     const [aside, setAside] = useState([]);
+    const [breadCrumbs, setBreadCrumbs] = useState([]);
 
     return (
         <RootLayout>
@@ -155,6 +157,9 @@ export default function App() {
                     setNavBarLinksAddon,
                     aside,
                     setAside,
+                    breadCrumbs,
+                    setBreadCrumbs,
+                    expressFingerprint,
                 }}
             />
         </RootLayout>

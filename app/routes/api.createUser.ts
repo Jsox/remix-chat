@@ -2,7 +2,7 @@ import { type ActionArgs, json, redirect } from '@remix-run/node';
 import { userGetOrCreate } from 'app/lib/Prisma';
 
 export async function loader() {
-    throw redirect('/', 404)
+    throw json(null, 404);
 };
 
 export async function action({ request }: ActionArgs) {

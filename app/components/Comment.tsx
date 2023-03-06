@@ -81,7 +81,7 @@ export default function CommentHtml(data: CommentHtmlProps) {
             setMounted(true);
         }, index * 10);
         // setMounted(true);
-    });
+    }, []);
     return (
         <Transition mounted={mounted} transition="pop-bottom-left" duration={500}>
             {(styles) => (

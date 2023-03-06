@@ -4,7 +4,6 @@ import { useFetcher } from '@remix-run/react';
 import Layout from 'app/layouts/Layout';
 
 export default function AI21() {
-    // const { navBarLinksAddon, setNavBarLinksAddon } = useOutletContext();
     const ai21Fetcher = useFetcher();
     const [aiTestValue, setAiTestValue] = useInputState('Write an paragraph about Russia');
 

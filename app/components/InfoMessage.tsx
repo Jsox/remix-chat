@@ -1,6 +1,6 @@
-import { Blockquote, Paper } from '@mantine/core';
-import { IconAlertTriangle } from '@tabler/icons';
-import { type ReactNode } from 'react';
+import { Alert, Blockquote, Paper, Text } from '@mantine/core';
+import { IconAlertCircle, IconAlertTriangle } from '@tabler/icons';
+import { useState, type ReactNode } from 'react';
 
 export default function InfoMessage({
     text,
@@ -12,11 +12,26 @@ export default function InfoMessage({
     textAuthor?: ReactNode;
     icon?: ReactNode;
 }) {
+    const [opened, setOpened] = useState(true)
     return (
-        <Paper p={'md'} withBorder radius={'lg'} my={'xl'} {...others}>
-            <Blockquote color={'primary'} cite={textAuthor} icon={icon}>
-                {text}
-            </Blockquote>
-        </Paper>
+
+        opened &&
+        <Alert
+            my={'xl'}
+            onClose={() => setOpened(false)}
+            closeButtonLabel="Закрыть предупреждение"
+            icon={<IconAlertTriangle size="2rem" />}
+            title={<Text fz='md'>Внимание!</Text>}
+            color="blue"
+            withCloseButton
+            variant="light"
+            radius={'sm'} >
+            <Text fz={'lg'}>{text}</Text>
+        </Alert>
     );
 }
+        // <Paper py={'md'} px={{ xs: 'md', md: 'lg', xl: 45 }} withBorder radius={'lg'} my={'xl'} {...others}>
+        //     <Blockquote pl={20} color={'primary'} cite={textAuthor} icon={icon}>
+        //         <Text>{text}</Text>
+        //     </Blockquote>
+        //</Paper>

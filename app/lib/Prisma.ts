@@ -1,17 +1,18 @@
-import { PrismaClient, type User, type ChatMessage, type MessageAuthor } from '@prisma/client';
+import {
+    PrismaClient,
+    type User,
+    type ChatMessage,
+    type MessageAuthor,
+} from '@prisma/client';
 import ISR from 'faster-query';
 import auth from 'app/services/auth.server';
 
 let prisma: PrismaClient;
 
-if (process.env.NODE_ENV === 'production') {
-    prisma = new PrismaClient();
-} else {
-    if (!global.prisma) {
-        global.prisma = new PrismaClient();
-    }
-    prisma = global.prisma;
+if (!global.prisma) {
+    global.prisma = new PrismaClient();
 }
+prisma = global.prisma;
 
 class Prisma {
     static async userGetOrCreate(data: User): Promise<User> {
@@ -45,7 +46,10 @@ class Prisma {
 
         if (exists) {
             exists.password = '******';
-            console.log('Got from cache userGetOrCreate for:', Date.now() - start + 'ms');
+            console.log(
+                'Got from cache userGetOrCreate for:',
+                Date.now() - start + 'ms'
+            );
             return exists;
         }
 
@@ -58,7 +62,9 @@ class Prisma {
         return newUser;
     }
 
-    static async getUserMessages(uid: number | null): Promise<ChatMessage[] | []> {
+    static async getUserMessages(
+        uid: number | null
+    ): Promise<ChatMessage[] | []> {
         if (!uid) return [];
         const messages = async () =>
             await prisma.chatMessage.findMany({
@@ -81,8 +87,27 @@ class Prisma {
         });
         return mgs.getData() || [];
     }
+
+    static async getProjects(uid: number | null) {
+        if (!uid) return []
+        return await prismaClient.project.findMany({
+            where: {
+                User: {
+                    id: uid,
+                },
+            },
+            orderBy: {
+                created: 'desc'
+            },
+            include: {
+                Sections: true,
+                Topics: true,
+            },
+        });
+    }
 }
 
 export const prismaClient = prisma;
+export const getProjects = Prisma.getProjects;
 export const userGetOrCreate = Prisma.userGetOrCreate;
 export const getUserMessages = Prisma.getUserMessages;
