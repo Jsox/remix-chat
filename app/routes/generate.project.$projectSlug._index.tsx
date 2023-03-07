@@ -1,16 +1,17 @@
 import { type LoaderArgs, json, redirect, type MetaFunction } from '@remix-run/node';
-import { useLoaderData, useOutletContext } from '@remix-run/react';
+import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react';
 import { IconDetails, IconListDetails, type TablerIcon, IconStack2 } from '@tabler/icons';
 import { HeroText } from 'app/components/HeroText/HeroText';
 import { useEffect } from 'react';
 import { type User, type Project } from '@prisma/client';
 import { prismaClient } from 'app/lib/Prisma';
 import auth from 'app/services/auth.server';
-import { Text } from '@mantine/core'
+import { Button, Container, Text } from '@mantine/core'
 import { useTime } from 'app/hooks/useTime';
 import { useColors } from 'app/hooks/useColors';
 import { TSetNavBarOptions } from 'app/types';
 import { useHydrated } from 'remix-utils';
+import SectionsAccordion from 'app/components/blog/SectionsAccordion';
 
 export const meta: MetaFunction = ({ data }) => {
     const { currentProject } = data;
@@ -44,28 +45,12 @@ export async function loader({ request, params }: LoaderArgs) {
         throw json(null, 404);
     }
 
-    return json({ projectSlug, currentProject });
+    return json({ projectSlug, currentProject, user });
 }
 
 export default function ProjectPage() {
-    const loader = useLoaderData();
-    const currentProject: Project = loader.currentProject
-    const { navBarLinksAddon, setNavBarLinksAddon, setBreadCrumbs }: any = useOutletContext()
-
-    // navBarLinksAddon.push({
-    //     label: 'Разделы Проекта',
-    //     icon: IconStack2,
-    //     initiallyOpened: true,
-    //     links: [{
-    //         link: '/',
-    //         label: 'test'
-    //     }]
-
-    // })
-
-    // useEffect(() => {
-    //     setNavBarLinksAddon(navBarLinksAddon)
-    // }, [])
+    const { user, currentProject }: { user: User, currentProject: Project } = useLoaderData();
+    const { setBreadCrumbs }: any = useOutletContext()
 
     const { fromNow, formatString } = useTime(currentProject.created);
     const { contrastColor } = useColors();
@@ -100,6 +85,19 @@ export default function ProjectPage() {
         setBreadCrumbs(bci)
     }, []);
 
+    const genSecFetcher = useFetcher()
+
+    const genSec = () => {
+        if (!user) return;
+        genSecFetcher.submit({
+            query: currentProject.title,
+            pid: currentProject.id.toString()
+        }, {
+            action: '/api/createSections',
+            method: 'post'
+        })
+    }
+
     return (
         <>
             <HeroText
@@ -108,6 +106,11 @@ export default function ProjectPage() {
                 titleEnd=""
                 description={desc}
             />
+            <Container>
+                <SectionsAccordion sections={currentProject.Sections} />
+            </Container>
+            <Button onClick={genSec}>genSections</Button>
+            {genSecFetcher.data && JSON.stringify(genSecFetcher.data)}
         </>
     );
 }

@@ -21,7 +21,7 @@ const useStyles = createStyles(theme => ({
         fontWeight: 500,
         display: 'block',
         width: '100%',
-        padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
+        padding: `${theme.spacing.xs} ${theme.spacing.md}`,
         color:
             theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
         fontSize: theme.fontSizes.md,
@@ -39,7 +39,7 @@ const useStyles = createStyles(theme => ({
         fontWeight: 400,
         display: 'block',
         textDecoration: 'none',
-        padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
+        padding: `${theme.spacing.xs} ${theme.spacing.md}`,
         paddingLeft: 31,
         marginLeft: 30,
         fontSize: theme.fontSizes.sm,

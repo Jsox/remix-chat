@@ -48,22 +48,22 @@ model ChatMessage {
 
 model Translate {
   id   Int    @id @default(autoincrement())
-  ru   String @unique
-  en   String @unique
+  ru   String @db.VarChar(65535)
+  en   String @db.VarChar(65535)
   hash String @unique
 }
 
 model Completition {
   id               Int       @id @default(autoincrement())
-  query            String
-  answer           String
+  query            String    @db.VarChar(65535)
+  answer           String    @db.VarChar(65535)
   created          DateTime  @default(now())
   promptTokens     Int
   completionTokens Int
   totalTokens      Int
   messageId        String    @unique
   userId           Int
-  user             User      @relation(fields: [userId], references: [id])
+  User             User      @relation(fields: [userId], references: [id])
   Section          Section[]
   Topic            Topic[]
 }
@@ -84,14 +84,13 @@ model Section {
   id                     Int          @id @default(autoincrement())
   created                DateTime     @default(now())
   sectionTitle           String
-  sectionMetaTitle       String?
-  sectionHtmlDescription String?
-  sectionMetaDescription String
-  sectionSlug            String?      @unique
+  sectionMetaTitle       String?      @db.VarChar(65535)
+  sectionHtmlDescription String?      @db.VarChar(65535)
+  sectionMetaDescription String       @db.VarChar(65535)
   sectionKeyWords        String?
   completitionId         Int
-  completition           Completition @relation(fields: [completitionId], references: [id])
-  Project                Project?      @relation(fields: [projectId], references: [id])
+  Completition           Completition @relation(fields: [completitionId], references: [id])
+  Project                Project?     @relation(fields: [projectId], references: [id])
   projectId              Int?
   User                   User         @relation(fields: [userId], references: [id])
   userId                 Int
@@ -104,13 +103,12 @@ model Topic {
   created              DateTime     @default(now())
   topicTitle           String
   topicMetaTitle       String?
-  topicHtmlSummary     String?
-  topicMetaDescription String
-  topicHtmlPost        String?
-  topicSlug            String?      @unique
-  topicKeyWords        String?
+  topicHtmlSummary     String?      @db.VarChar(65535)
+  topicMetaDescription String       @db.VarChar(65535)
+  topicHtmlPost        String?      @db.VarChar(65535)
+  topicKeyWords        String?      @db.VarChar(65535)
   completitionId       Int
-  completition         Completition @relation(fields: [completitionId], references: [id])
+  Completition         Completition @relation(fields: [completitionId], references: [id])
   Project              Project?     @relation(fields: [projectId], references: [id])
   projectId            Int?
   User                 User         @relation(fields: [userId], references: [id])

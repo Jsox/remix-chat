@@ -11,3 +11,7 @@ export function useTime(dateString: number | string | Date) {
         formatString: dayjs(dateString).format('D MMMM YYYYг. в HH:mm'),
     };
 }
+
+export function getTimeFromNow(dateString: number | string | Date) {
+    return dayjs(dateString).fromNow()
+}

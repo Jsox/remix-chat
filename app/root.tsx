@@ -22,7 +22,7 @@ import {
     MantineProvider,
 } from '@mantine/core';
 import { StylesPlaceholder } from '@mantine/remix';
-import { NotificationsProvider } from '@mantine/notifications';
+import { Notifications } from '@mantine/notifications';
 import { theme } from './theme';
 import { useLocalStorage } from '@mantine/hooks';
 import { authenticator } from './services/auth.server';
@@ -118,21 +118,20 @@ export function RootLayout(props: PropsWithChildren) {
             >
                 <ProgressBar />
                 <CustomFonts />
-                <NotificationsProvider position="top-right" limit={3}>
                     <html lang="ru">
                         <head>
                             <StylesPlaceholder />
                             <Meta />
                             <Links />
                         </head>
-                        <body>
+                    <body>
+                        <Notifications position="top-right" limit={3} />
                             {props.children}
                             <ScrollRestoration />
                             <Scripts />
                             <LiveReload />
                         </body>
-                    </html>
-                </NotificationsProvider>
+                </html>
             </MantineProvider>
         </ColorSchemeProvider>
     );

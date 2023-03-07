@@ -2,7 +2,7 @@ import { type ActionArgs, MetaFunction, json } from '@remix-run/node';
 import Layout from '../layouts/Layout';
 import { useActionData } from '@remix-run/react';
 import Messages from '../components/Messages/Messages';
-import { OpenAI } from '../lib/ai.server';
+// import { OpenAI } from '../lib/ai.server';
 import { useEffect } from 'react';
 import { authenticator } from '../services/auth.server';
 import { useScrollIntoView } from '@mantine/hooks';
@@ -50,12 +50,12 @@ export async function action({ request }: ActionArgs) {
         return json({ fromAi: 'Неверный запрос' });
     }
 
-    const Ai = new OpenAI({ userId: user.id, debug: true, model: 'text-davinci-003' });
+    // const Ai = new OpenAI({ userId: user.id, debug: true, model: 'text-davinci-003' });
 
-    const fromAi = await Ai.get(query);
+    // const fromAi = await Ai.get(query);
 
     // const fromAi = await tellMeAi(query, 7);
-
+    return null
     return json(fromAi);
 }
 

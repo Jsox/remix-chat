@@ -31,9 +31,7 @@ export async function loader({ request, params }: LoaderArgs) {
 
         sections = await prismaClient.section.findMany({
             where: {
-                User: {
-                    id: user.id,
-                },
+                userId: user.id,
             },
             include: {
                 Topics: true,
@@ -41,9 +39,7 @@ export async function loader({ request, params }: LoaderArgs) {
         });
         topics = await prismaClient.topic.findMany({
             where: {
-                User: {
-                    id: user.id,
-                },
+                userId: user.id,
             },
         });
     }
@@ -83,26 +79,7 @@ export default function ProjectLayout() {
             initiallyOpened: !sectionSlug,
         });
     }
-    // let temp2 = []
-    // if (projectSlug && projects?.length) {
-    //     let currentProject = projects.filter(pr => pr.url === projectSlug)
-    //     //&& currentProject.Sections.length > 0
-    //     if (currentProject.length) {
-    //         temp2 = [{
-    //             label: 'Разделы Проекта',
-    //             icon: IconStack2,
-    //             initiallyOpened: true,
-    //             links: [{
-    //                 link: '/',
-    //                 label: currentProject[0].title
-    //             }]
-    //         }]
-    //         temp = temp.concat(temp2)
-    //         // temp2 = currentProject[0].Sections.map(sec => ({
 
-    //         // }))
-    //     }
-    // }
     useEffect(() => {
         setNavBarLinksAddon(temp);
     }, []);

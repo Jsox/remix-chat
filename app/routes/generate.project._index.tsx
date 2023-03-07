@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Form, useFetcher, useOutletContext } from '@remix-run/react';
-import { Alert, Flex } from '@mantine/core';
+import { Alert, Container, Flex } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { type MetaFunction } from '@remix-run/node';
@@ -88,53 +88,55 @@ export default function GenerateProject() {
                 titleEnd="в несколько кликов"
                 description="Прошли те времена, когда создатели контента часами исследовали, писали и редактировали одну запись в блоге. С инструментами на основе ИИ создавать высококачественные статьи так же просто, как нажать несколько кнопок"
             />
-            <PageTitle title={'Введите краткое, но ёмкое название блога'} />
+            <Container>
+                <PageTitle title={'Введите краткое, но ёмкое название блога'} />
 
-            <Form onSubmit={submitNewProject}>
-                <CreateProjectForm
-                    error={newProjectFetcher?.data?.error}
-                    description={
-                        'Например: "Генерация блога с помощью ИИ", "Производство мороженого"'
-                    }
-                    descriptionProps={{
-                        align: 'center',
-                        pb: 'xs',
-                    }}
-                    disabled={newProjectFetcher.state != 'idle'}
-                    isloading={newProjectFetcher.state != 'idle' ? '1' : ''}
-                    value={newProject}
-                    onChange={createNewProject}
+                <Form onSubmit={submitNewProject}>
+                    <CreateProjectForm
+                        error={newProjectFetcher?.data?.error}
+                        description={
+                            'Например: "Генерация блога с помощью ИИ", "Производство мороженого"'
+                        }
+                        descriptionProps={{
+                            align: 'center',
+                            pb: 'xs',
+                        }}
+                        disabled={newProjectFetcher.state != 'idle'}
+                        isloading={newProjectFetcher.state != 'idle' ? '1' : ''}
+                        value={newProject}
+                        onChange={createNewProject}
+                    />
+                    {!isIdle && <WaitingMessages />}
+                </Form>
+                {!!projects.length && (
+                    <>
+                        <PageTitle title={'Перейти к существующему проекту'} />
+                        <Flex
+                            gap="lg"
+                            justify="center"
+                            align="flex-start"
+                            direction="column"
+                            wrap="wrap"
+                        >
+                            {
+                                projects.map((pr: Project) => (
+                                    <ProjectCard key={pr?.url} project={pr} />
+                                ))}
+                        </Flex>
+                    </>
+                )}
+                {!projects.length && (
+                    <InfoMessage
+                        text="У Вас пока нет проектов... Создайте свой первый выше, введите название в форму."
+                        textAuthor="Аиша"
+                    />
+                )}
+                <Article
+                    height={450}
+                    title={'Генерация блога с помощью ИИ! Как? Почему?'}
+                    html={CreateProjectIndexArticle}
                 />
-                {!isIdle && <WaitingMessages />}
-            </Form>
-            {!!projects.length && (
-                <>
-                    <PageTitle title={'Перейти к существующему проекту'} />
-                    <Flex
-                        gap="lg"
-                        justify="center"
-                        align="flex-start"
-                        direction="column"
-                        wrap="wrap"
-                    >
-                        {
-                            projects.map((pr: Project) => (
-                                <ProjectCard key={pr?.url} project={pr} />
-                            ))}
-                    </Flex>
-                </>
-            )}
-            {!projects.length && (
-                <InfoMessage
-                    text="У Вас пока нет проектов... Создайте свой первый выше, введите название в форму."
-                    textAuthor="Аиша"
-                />
-            )}
-            <Article
-                height={450}
-                title={'Генерация блога с помощью ИИ! Как? Почему?'}
-                html={CreateProjectIndexArticle}
-            />
+            </Container>
         </>
     );
 }

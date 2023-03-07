@@ -62,7 +62,7 @@ export function HeaderAction({ links, opened, toggle }: HeaderActionProps) {
 
         if (menuItems) {
             return (
-                <Menu key={link.label} trigger="hover" exitTransitionDuration={0}>
+                <Menu key={link.label} trigger="hover">
                     <Menu.Target>
                         <NavLink to={link.link} className={classes.link} onClick={(event) => event.preventDefault()}>
                             <Center>
