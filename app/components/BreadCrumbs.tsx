@@ -24,7 +24,7 @@ export default function BreadCrumbs({ breadCrumbs = [] }: { breadCrumbs?: { titl
             <Breadcrumbs separator={<IconArrowMoveRight />} mt='xs'>
                 {items}
             </Breadcrumbs>
-            <Divider />
+            {/* <Divider /> */}
         </>
     )
 }

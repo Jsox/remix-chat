@@ -1,4 +1,4 @@
-import { Stepper, Title, Text, Divider } from '@mantine/core';
+import { Stepper, Title, Text, Divider, Box } from '@mantine/core';
 import { json, redirect, type LoaderArgs } from '@remix-run/node';
 import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react';
 import LoginButtons from 'app/components/auth/LoginButtons';
@@ -151,15 +151,15 @@ export default function ProjectLayout() {
     );
 }
 
-export const StepperDesc = ({ title, desc }: Record<string, string>) => {
+export const StepperDesc = ({ title, desc, ...others }: Record<string, string>) => {
     const { gradientTitleColor } = useColors()
     return (
-        <>
+        <Box {...others}>
             <Divider mt={'lg'} label={<IconBulb size={24} />} labelPosition={'center'} />
             <Title fw={600} gradient={gradientTitleColor} variant={'gradient'} align="center" m={0} py={'md'} order={4}>
                 {title}
             </Title>
             <Text align="justify">{desc}</Text>
-        </>
+        </Box>
     );
 };

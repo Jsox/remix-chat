@@ -1,6 +1,5 @@
-import { type LoaderArgs, json, redirect, type MetaFunction } from '@remix-run/node';
-import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react';
-import { IconDetails, IconListDetails, type TablerIcon, IconStack2 } from '@tabler/icons';
+import { type LoaderArgs, json, type MetaFunction } from '@remix-run/node';
+import { useFetcher, useLoaderData, useLocation, useOutletContext } from '@remix-run/react';
 import { HeroText } from 'app/components/HeroText/HeroText';
 import { useEffect } from 'react';
 import { type User, type Project } from '@prisma/client';
@@ -9,9 +8,7 @@ import auth from 'app/services/auth.server';
 import { Button, Container, Text } from '@mantine/core'
 import { useTime } from 'app/hooks/useTime';
 import { useColors } from 'app/hooks/useColors';
-import { TSetNavBarOptions } from 'app/types';
-import { useHydrated } from 'remix-utils';
-import SectionsAccordion from 'app/components/blog/SectionsAccordion';
+import SectionsAccordion from 'app/components/blog/section/SectionsAccordion';
 
 export const meta: MetaFunction = ({ data }) => {
     const { currentProject } = data;
@@ -21,6 +18,8 @@ export const meta: MetaFunction = ({ data }) => {
     };
 };
 export async function loader({ request, params }: LoaderArgs) {
+
+
     const { projectSlug } = params;
     const user: User | null = await auth(request);
     if (!user || !projectSlug) {
@@ -81,9 +80,11 @@ export default function ProjectPage() {
         }
     ]
 
+
+
     useEffect(() => {
         setBreadCrumbs(bci)
-    }, []);
+    }, [currentProject]);
 
     const genSecFetcher = useFetcher()
 
@@ -106,8 +107,8 @@ export default function ProjectPage() {
                 titleEnd=""
                 description={desc}
             />
-            <Container>
-                <SectionsAccordion sections={currentProject.Sections} />
+            <Container p={0}>
+                <SectionsAccordion sections={currentProject.Sections} project={currentProject} />
             </Container>
             <Button onClick={genSec}>genSections</Button>
             {genSecFetcher.data && JSON.stringify(genSecFetcher.data)}

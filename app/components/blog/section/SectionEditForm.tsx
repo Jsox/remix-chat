@@ -1,8 +1,11 @@
-import { TextInput, Text, Textarea, useMantineTheme, createStyles, } from "@mantine/core";
+import { TextInput, Text, Textarea, useMantineTheme, createStyles, Box, } from "@mantine/core";
+import { useId } from "@mantine/hooks";
 import { type Section } from "@prisma/client";
+import RichEditorText from "app/components/RichTextEditor";
 import { getTimeFromNow } from "app/hooks/useTime";
 import { type ReactElement } from "react";
 import { SectionFields } from './SectionFields';
+
 
 const useStyles = createStyles((theme) => {
     return {
@@ -31,34 +34,38 @@ export default function SectionEditForm({ section }: { section: Section }) {
         className: classes.input,
         size: 'md'
     }
+    const unkey = useId()
 
     for (const key in SectionFields) {
         if (Object.prototype.hasOwnProperty.call(SectionFields, key)) {
             const Field = SectionFields[key];
 
-            let data = section[key];
+            const ukey = useId()
+
+            let data = section[key] || '';
             const type = Field.type || null
             const ru = Field.ru || null
             const isChangeable = Field.isChangeable
 
             if (!type) {
-                jsx.push(<TextInput {...inputProps} disabled={!isChangeable} labelProps={labelProps} aria-label={`Отредактируйте ${ru}`} name={key} label={ru} value={data} />)
+                jsx.push(<TextInput key={ukey} {...inputProps} readOnly={!isChangeable} labelProps={labelProps} aria-label={`Отредактируйте ${ru}`} name={key} label={ru} defaultValue={data} />)
 
             } else {
                 if (type === 'text') {
-                    jsx.push(<Textarea autosize
-                        minRows={2} {...inputProps} disabled={!isChangeable} labelProps={labelProps} aria-label={`Отредактируйте ${ru}`} name={key} label={ru} value={data} />)
+                    jsx.push(<Textarea key={ukey} autosize
+                        minRows={2} {...inputProps} readOnly={!isChangeable} labelProps={labelProps} aria-label={`Отредактируйте ${ru}`} name={key} label={ru} defaultValue={data} />)
                 }
 
                 if (type === 'time') {
                     data = getTimeFromNow(data)
-                    jsx.push(<TextInput {...inputProps} disabled={!isChangeable} labelProps={labelProps} aria-label={`Отредактируйте ${ru}`} name={key} label={ru} value={data} />)
+                    jsx.push(<TextInput key={ukey} {...inputProps} readOnly={!isChangeable} labelProps={labelProps} aria-label={`Отредактируйте ${ru}`} name={key} label={ru} defaultValue={data} />)
+                }
+                if (type === 'html') {
+                    jsx.push(<Box key={ukey}><Text className={classes.label}>{ru}</Text><RichEditorText html={data} /></Box>)
                 }
             }
-
-            console.log(key, Field)
         }
     }
 
-    return jsx
+    return <>{jsx}</>
 }

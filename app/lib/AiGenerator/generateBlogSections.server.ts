@@ -10,7 +10,7 @@ export type ReturnAfterGenerate = Promise<(Section | Topic)[] | (Section | Topic
 }>
 
 export async function generateBlogSections(uid: number, pid: number, opts: { blogTheme: string, generateNum?: number }): ReturnAfterGenerate {
-    const { blogTheme, generateNum = 3, } = opts;
+    const { blogTheme, generateNum = 2, } = opts;
 
     const { error, errorMessage, resultEn, resultRu } = await filterAndTranslateTo(blogTheme, 'en', 'text')
 

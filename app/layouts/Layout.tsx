@@ -41,8 +41,10 @@ export default function Layout(props: any) {
 
     return (
         <AppShell
+            // layout={'alt'}
+            fixed={true}
             styles={{
-                main: { ...bodyStyles },
+                main: { ...bodyStyles, width: 'calc(100vw - 17px)' },
             }}
             navbarOffsetBreakpoint='md'
             asideOffsetBreakpoint='lg'
@@ -74,7 +76,7 @@ export default function Layout(props: any) {
             })}
         >
             <>
-                <BreadCrumbs breadCrumbs={breadCrumbs} />
+                {/* <BreadCrumbs breadCrumbs={breadCrumbs} /> */}
                 {props.children}
             </>
         </AppShell>

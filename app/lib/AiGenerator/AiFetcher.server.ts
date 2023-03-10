@@ -20,6 +20,11 @@ class AiFetcher {
                 body: JSON.stringify(query)
             })
             const json: CompletionResponse = await res.json();
+            
+            if (json?.error) {
+                throw new Error(json?.error?.message);
+            }
+            
 
             const text = json?.choices[0]?.text
 

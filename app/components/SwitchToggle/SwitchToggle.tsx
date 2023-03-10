@@ -23,7 +23,7 @@ export function SwitchToggle() {
                     multiline
                     position="bottom"
                     label={'Сменить тему оформления на ' + ruColorSchemeName}
-                    style={{ zIndex: 999, ...primaryStyles }}
+                    style={{ zIndex: 999}}
                     // color={primaryBackgroundColor}
                 >
                     <span>{colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoonStars size={18} />}</span>

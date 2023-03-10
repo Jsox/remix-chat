@@ -19,16 +19,17 @@ export default function InfoMessage({
 
         opened ?
             <Alert
+                w={'100%'}
                 my={'xl'}
                 p={{ xs: 'xs', md: 'md', lg: 'xl', }}
                 onClose={() => setOpened(false)}
                 closeButtonLabel="Закрыть предупреждение"
                 icon={<IconAlertTriangle size="2rem" />}
                 title={<Text fz='md'>{title}</Text>}
-                color="blue"
+                color={others.color || 'blue'}
                 withCloseButton
                 variant="light"
-                radius={'sm'} >
+                radius={'md'} >
                 <Text fz={'lg'}>{text}</Text>
             </Alert>
 
