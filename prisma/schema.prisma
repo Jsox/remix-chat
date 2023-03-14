@@ -8,21 +8,22 @@ datasource db {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
-  email         String?        @unique
-  name          String?
-  avatar        String?
-  fingerprint   String         @unique
-  isAdmin       Boolean?       @default(false)
-  phone         String?        @unique
-  tokens        Int?           @default(1000)
-  didPay        Boolean?       @default(false)
-  password      String?
-  chatMessages  ChatMessage[]
-  Completitions Completition[]
-  Projects      Project[]
-  Sections      Section[]
-  Topics        Topic[]
+  id               Int                @id @default(autoincrement())
+  email            String?            @unique
+  name             String?
+  avatar           String?
+  fingerprint      String             @unique
+  isAdmin          Boolean?           @default(false)
+  phone            String?            @unique
+  tokens           Int?               @default(3000)
+  didPay           Boolean?           @default(false)
+  password         String?
+  chatMessages     ChatMessage[]
+  Completitions    Completition[]
+  Projects         Project[]
+  Sections         Section[]
+  Topics           Topic[]
+  ChatCompletition ChatCompletition[]
 
   @@index([fingerprint, id])
 }
@@ -54,13 +55,24 @@ model Translate {
 }
 
 model Completition {
+  id               Int      @id @default(autoincrement())
+  query            String   @db.VarChar(65535)
+  answer           String   @db.VarChar(65535)
+  created          DateTime @default(now())
+  promptTokens     Int
+  completionTokens Int
+  totalTokens      Int
+  messageId        String   @unique
+  userId           Int
+  User             User     @relation(fields: [userId], references: [id])
+}
+
+model ChatCompletition {
   id               Int       @id @default(autoincrement())
   query            String    @db.VarChar(65535)
   answer           String    @db.VarChar(65535)
   created          DateTime  @default(now())
-  promptTokens     Int
-  completionTokens Int
-  totalTokens      Int
+  totalChars       Int
   messageId        String    @unique
   userId           Int
   User             User      @relation(fields: [userId], references: [id])
@@ -81,41 +93,41 @@ model Project {
 }
 
 model Section {
-  id                     Int          @id @default(autoincrement())
-  created                DateTime     @default(now())
+  id                     Int               @id @default(autoincrement())
+  created                DateTime          @default(now())
   sectionTitle           String
-  sectionMetaTitle       String?      @db.VarChar(65535)
-  sectionHtmlDescription String?      @db.VarChar(65535)
-  sectionMetaDescription String       @db.VarChar(65535)
+  sectionMetaTitle       String?           @db.VarChar(65535)
+  sectionHtmlDescription String?           @db.VarChar(65535)
+  sectionMetaDescription String            @db.VarChar(65535)
   sectionKeyWords        String?
-  completitionId         Int
-  Completition           Completition @relation(fields: [completitionId], references: [id])
-  Project                Project?     @relation(fields: [projectId], references: [id])
+  Project                Project?          @relation(fields: [projectId], references: [id])
   projectId              Int?
-  User                   User         @relation(fields: [userId], references: [id])
+  User                   User              @relation(fields: [userId], references: [id])
   userId                 Int
   Topics                 Topic[]
-  active                 Boolean      @default(true)
+  active                 Boolean           @default(true)
+  ChatCompletition       ChatCompletition? @relation(fields: [chatCompletitionId], references: [id])
+  chatCompletitionId     Int?
 }
 
 model Topic {
-  id                   Int          @id @default(autoincrement())
-  created              DateTime     @default(now())
+  id                   Int               @id @default(autoincrement())
+  created              DateTime          @default(now())
   topicTitle           String
   topicMetaTitle       String?
-  topicHtmlSummary     String?      @db.VarChar(65535)
-  topicMetaDescription String       @db.VarChar(65535)
-  topicHtmlPost        String?      @db.VarChar(65535)
-  topicKeyWords        String?      @db.VarChar(65535)
-  completitionId       Int
-  Completition         Completition @relation(fields: [completitionId], references: [id])
-  Project              Project?     @relation(fields: [projectId], references: [id])
+  topicHtmlSummary     String?           @db.VarChar(65535)
+  topicMetaDescription String            @db.VarChar(65535)
+  topicHtmlPost        String?           @db.VarChar(65535)
+  topicKeyWords        String?           @db.VarChar(65535)
+  Project              Project?          @relation(fields: [projectId], references: [id])
   projectId            Int?
-  User                 User         @relation(fields: [userId], references: [id])
+  User                 User              @relation(fields: [userId], references: [id])
   userId               Int
-  Section              Section?     @relation(fields: [sectionId], references: [id])
+  Section              Section?          @relation(fields: [sectionId], references: [id])
   sectionId            Int?
-  active               Boolean      @default(true)
+  active               Boolean           @default(true)
+  ChatCompletition     ChatCompletition? @relation(fields: [chatCompletitionId], references: [id])
+  chatCompletitionId   Int?
 }
 
 enum MessageAuthor {

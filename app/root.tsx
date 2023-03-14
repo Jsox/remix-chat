@@ -4,7 +4,7 @@ import {
     type LoaderArgs,
     type MetaFunction,
 } from '@remix-run/node';
-import { type PropsWithChildren, useState, type ReactElement } from 'react';
+import { type PropsWithChildren, useState } from 'react';
 import {
     Links,
     LiveReload,
@@ -25,7 +25,7 @@ import { StylesPlaceholder } from '@mantine/remix';
 import { Notifications } from '@mantine/notifications';
 import { theme } from './theme';
 import { useLocalStorage } from '@mantine/hooks';
-import { authenticator } from './services/auth.server';
+import auth, { authenticator } from './services/auth.server';
 import Layout from './layouts/Layout';
 import { type User } from '@prisma/client';
 import { NothingFoundBackground } from './components/NothingFoundBackground/NothingFoundBackground';
@@ -34,6 +34,7 @@ import { ServerOverload } from './components/ServerOverload/ServerOverload';
 import { CustomFonts } from './fonts/CustomFonts';
 
 import ProgressBar from './components/ProgressBar';
+import { useEventSource } from 'remix-utils';
 // import PWALinks from "./components/PWALinks";
 
 export const meta: MetaFunction = () => ({
@@ -45,9 +46,19 @@ createEmotionCache({ key: 'mantine' });
 
 export async function loader({ request, context }: LoaderArgs) {
     const { fingerprint: expressFingerprint } = context;
-    console.log({ expressFingerprint });
-    const user = (await authenticator.isAuthenticated(request)) || null;
-    return json({ userLoader: user, expressFingerprint });
+
+    const user = (await auth(request)) || null;
+
+    let uniqueUserString: string = ''
+    if (!user) {
+        const uniqid = require('uniqid');
+        uniqueUserString = uniqid()
+    } else {
+        const md5 = require('md5');
+        uniqueUserString = md5(user)
+    }
+
+    return json({ userLoader: user, expressFingerprint, uniqueUserString });
 }
 
 export function CatchBoundary() {
@@ -118,19 +129,19 @@ export function RootLayout(props: PropsWithChildren) {
             >
                 <ProgressBar />
                 <CustomFonts />
-                    <html lang="ru">
-                        <head>
-                            <StylesPlaceholder />
-                            <Meta />
-                            <Links />
-                        </head>
+                <html lang="ru">
+                    <head>
+                        <StylesPlaceholder />
+                        <Meta />
+                        <Links />
+                    </head>
                     <body>
                         <Notifications position="top-right" limit={3} />
-                            {props.children}
-                            <ScrollRestoration />
-                            <Scripts />
-                            <LiveReload />
-                        </body>
+                        {props.children}
+                        <ScrollRestoration />
+                        <Scripts />
+                        <LiveReload />
+                    </body>
                 </html>
             </MantineProvider>
         </ColorSchemeProvider>
@@ -140,10 +151,12 @@ export function RootLayout(props: PropsWithChildren) {
 //     return [{ rel: "manifest", href: "/resources/manifest.webmanifest" }];
 // };
 export default function App() {
-    const { userLoader, expressFingerprint } = useLoaderData();
+    const { userLoader, expressFingerprint, uniqueUserString } = useLoaderData();
+
     const [user, setUser] = useState<User | null>(userLoader);
     const [navBarLinksAddon, setNavBarLinksAddon] = useState([]);
     const [aside, setAside] = useState([]);
+    const [userTokens, setUserTokens] = useState(user ? user.tokens : 0);
     const [breadCrumbs, setBreadCrumbs] = useState([]);
 
     return (
@@ -152,6 +165,8 @@ export default function App() {
                 context={{
                     user,
                     setUser,
+                    userTokens,
+                    setUserTokens,
                     navBarLinksAddon,
                     setNavBarLinksAddon,
                     aside,
@@ -159,6 +174,7 @@ export default function App() {
                     breadCrumbs,
                     setBreadCrumbs,
                     expressFingerprint,
+                    uniqueUserString
                 }}
             />
         </RootLayout>

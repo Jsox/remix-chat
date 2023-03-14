@@ -1,27 +1,24 @@
-import { type Completition } from '@prisma/client';
-import { type CompletionResponse } from '../../types/index';
+import { type ChatCompletition } from '@prisma/client';
+import { type ChatCompletionResponse } from '../../types/index';
 import { prismaClient } from '../Prisma';
-export async function completionWrite(uid: number, query: string, completion: CompletionResponse): Promise<Completition | { error: string; }> {
+import { AiFetcher } from './AiFetcher.server';
+import { type ErrorAnswer, errorHandler } from './errorHandler';
+
+export async function completionWrite(uid: number, query: string, completion: ChatCompletionResponse, chatCompletionText: string): Promise<ChatCompletition | ErrorAnswer> {
     try {
-        const data = {
+        const data: ChatCompletition = {
             query,
-            answer: completion.choices[0]?.text || '',
+            answer: chatCompletionText,
             created: completion?.created ? new Date(completion?.created) : new Date(Date.now()),
-            promptTokens: completion.usage?.prompt_tokens,
-            completionTokens: completion.usage?.completion_tokens,
-            totalTokens: completion.usage?.total_tokens,
+            totalChars: chatCompletionText.length,
             messageId: completion.id,
-            User: {
-                connect: { id: uid }
-            }
+            userId: uid,
         }
 
-        return await prismaClient.completition.create({
+        return await prismaClient.chatCompletition.create({
             data
         })
     } catch (error: any) {
-        return {
-            error: error?.message
-        }
+        return errorHandler({ message: 'Ошибка. Попробуйте позже', from: 'completionWrite', data: error, returnJson: true })
     }
 }

@@ -1,14 +1,18 @@
-import { type LoaderArgs, json, type MetaFunction } from '@remix-run/node';
-import { useFetcher, useLoaderData, useLocation, useOutletContext } from '@remix-run/react';
+import { type LoaderArgs, json, type MetaFunction, type ActionArgs } from '@remix-run/node';
+import { Form, useFetcher, useLoaderData, useOutletContext } from '@remix-run/react';
 import { HeroText } from 'app/components/HeroText/HeroText';
 import { useEffect } from 'react';
 import { type User, type Project } from '@prisma/client';
 import { prismaClient } from 'app/lib/Prisma';
 import auth from 'app/services/auth.server';
-import { Button, Container, Text } from '@mantine/core'
+import { Button, Container, Text, Textarea, TextInput } from '@mantine/core'
 import { useTime } from 'app/hooks/useTime';
 import { useColors } from 'app/hooks/useColors';
 import SectionsAccordion from 'app/components/blog/section/SectionsAccordion';
+import { showNotification } from '@mantine/notifications';
+import { IconAlertCircle, IconCheck } from '@tabler/icons';
+import EventStreamer from 'app/components/EventStreamer';
+import { emitter } from 'app/services/emitter';
 
 export const meta: MetaFunction = ({ data }) => {
     const { currentProject } = data;
@@ -17,9 +21,18 @@ export const meta: MetaFunction = ({ data }) => {
         description: "Страница проекта Блога"
     };
 };
-export async function loader({ request, params }: LoaderArgs) {
 
 
+export async function action({ request, context }: ActionArgs) {
+    const formData = await request.formData();
+    const message = formData.get("message");
+    const uniqueUserString = formData.get("uniqueUserString");
+
+    emitter.emit(uniqueUserString, message);
+    return json({ message });
+};
+
+export async function loader({ request, params, context }: LoaderArgs) {
     const { projectSlug } = params;
     const user: User | null = await auth(request);
     if (!user || !projectSlug) {
@@ -49,7 +62,8 @@ export async function loader({ request, params }: LoaderArgs) {
 
 export default function ProjectPage() {
     const { user, currentProject }: { user: User, currentProject: Project } = useLoaderData();
-    const { setBreadCrumbs }: any = useOutletContext()
+
+    const { setBreadCrumbs, uniqueUserString, setUserTokens }: any = useOutletContext()
 
     const { fromNow, formatString } = useTime(currentProject.created);
     const { contrastColor } = useColors();
@@ -92,12 +106,49 @@ export default function ProjectPage() {
         if (!user) return;
         genSecFetcher.submit({
             query: currentProject.title,
-            pid: currentProject.id.toString()
+            pid: `${currentProject.id}`,
+            uniqueUserString
         }, {
             action: '/api/createSections',
             method: 'post'
         })
     }
+
+    useEffect(() => {
+        if (genSecFetcher.data
+            && genSecFetcher.data.result.decremented
+            && !genSecFetcher.data?.error
+        ) {
+
+            showNotification({
+                id: 'genSecFetcher',
+                title: 'Отлично!',
+                message: `Новые Разделы блога добавлены!`,
+                color: 'green',
+                icon: <IconCheck />,
+            });
+
+            setUserTokens((exist) => {
+                return (exist - genSecFetcher.data.result.decremented)
+            })
+
+
+        }
+        if (genSecFetcher.data && genSecFetcher.data?.error) {
+            showNotification({
+                id: 'genSecFetcherError',
+                title: 'Ошибка!',
+                message: genSecFetcher.data?.error,
+                color: 'red',
+                icon: <IconAlertCircle />,
+            });
+        }
+    }, [genSecFetcher.data])
+        
+
+
+    const isFetching = genSecFetcher.state !== 'idle'
+
 
     return (
         <>
@@ -108,10 +159,19 @@ export default function ProjectPage() {
                 description={desc}
             />
             <Container p={0}>
+                <Button loaderPosition={'center'} disabled={isFetching} loading={isFetching} mt={'xl'} style={{ transition: 'all .3s ease' }} fullWidth size={'xl'} variant={'filled'} onClick={genSec}>
+                    Сгенерировать разделы Блога
+                </Button>
+                {/* <Form method="post" >
+                    <input type="hidden" value={uniqueUserString} name={'uniqueUserString'} />
+                    <Textarea minRows={5} m={'xl'} name="message" />
+                    <Button type={'submit'}>Send</Button>
+                </Form> */}
+
+                <EventStreamer />
                 <SectionsAccordion sections={currentProject.Sections} project={currentProject} />
             </Container>
-            <Button onClick={genSec}>genSections</Button>
-            {genSecFetcher.data && JSON.stringify(genSecFetcher.data)}
+
         </>
     );
 }

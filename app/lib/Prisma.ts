@@ -35,7 +35,7 @@ class Prisma {
             await prisma.user.findUnique({
                 where,
             });
-        let key = data.phone || data.fingerprint || data.email || 'qwerty';
+        let key = data.phone || data.fingerprint || data.email;
         const userExists = new ISR(exists, {
             key,
             cacheTime: 1000,

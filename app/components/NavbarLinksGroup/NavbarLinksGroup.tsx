@@ -21,7 +21,7 @@ const useStyles = createStyles(theme => ({
         fontWeight: 500,
         display: 'block',
         width: '100%',
-        padding: `${theme.spacing.xs} ${theme.spacing.md}`,
+        padding: `${theme.spacing.xs} 0 ${theme.spacing.md} 0`,
         color:
             theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
         fontSize: theme.fontSizes.md,
@@ -90,22 +90,6 @@ export function LinksGroup({
     initiallyOpened,
     links,
 }: LinksGroupProps) {
-    // const scaleY = {
-    //     in: { opacity: 1, transform: 'scaleY(1)' },
-    //     out: { opacity: 0, transform: 'scaleY(0)' },
-    //     common: { transformOrigin: 'top' },
-    //     transitionProperty: 'transform, opacity',
-    // };
-
-// const [mounted, setMounted] = useState(false);
-
-
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         setMounted(true);
-    //     }, index * 150);
-    // }, []);
-
 
     const { classes, theme } = useStyles()
     const hasLinks = Array.isArray(links)

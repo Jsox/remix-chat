@@ -53,7 +53,7 @@ export default function SectionEditForm({ section }: { section: Section }) {
             } else {
                 if (type === 'text') {
                     jsx.push(<Textarea key={ukey} autosize
-                        minRows={2} {...inputProps} readOnly={!isChangeable} labelProps={labelProps} aria-label={`Отредактируйте ${ru}`} name={key} label={ru} defaultValue={data} />)
+                        minRows={3} {...inputProps} readOnly={!isChangeable} labelProps={labelProps} aria-label={`Отредактируйте ${ru}`} name={key} label={ru} defaultValue={data} />)
                 }
 
                 if (type === 'time') {

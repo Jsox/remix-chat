@@ -37,7 +37,6 @@ export default function SectionsAccordion({ sections, project }: { sections: Sec
     const [debouncedSearchStr] = useDebouncedValue(searchStr, 600);
 
     useEffect(() => {
-        console.log({ project });
         trashSectionsHandlers.setState(ts())
         filteredSectionsHandlers.setState(as())
     }, [project])
@@ -45,8 +44,6 @@ export default function SectionsAccordion({ sections, project }: { sections: Sec
     const [activeSection, setActiveSection] = useState<string | null>(null);
 
     useEffect(() => {
-        console.log(debouncedSearchStr);
-
         if (searchStr.length < 3) {
             trashSectionsHandlers.setState(ts())
             filteredSectionsHandlers.setState(as())

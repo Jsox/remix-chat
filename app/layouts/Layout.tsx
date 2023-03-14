@@ -11,8 +11,6 @@ import { type LinksFunction } from '@remix-run/node'
 import BreadCrumbs from 'app/components/BreadCrumbs'
 
 export default function Layout(props: any) {
-    // console.log({ state });
-
     const {
         navBarLinksAddon = [],
         aside = [],
@@ -31,10 +29,6 @@ export default function Layout(props: any) {
         setScrollLocked(opened)
     }, [opened])
 
-    // useEffect(() => {
-    //     console.log({ states });
-    // }, [states]);
-
     const asideContent = Array.isArray(aside)
         ? aside.map((c, i) => <div key={i}>{c}</div>)
         : null
@@ -46,13 +40,12 @@ export default function Layout(props: any) {
             styles={{
                 main: { ...bodyStyles, width: 'calc(100vw - 17px)' },
             }}
-            navbarOffsetBreakpoint='md'
+            navbarOffsetBreakpoint='sm'
             asideOffsetBreakpoint='lg'
             navbar={
                 <NavbarSearch
                     navBarLinks={newNavBarLinks}
                     addons={smallerLg ? asideContent : null}
-                    user={user}
                     opened={opened}
                     toggle={toggle}
                 />
@@ -60,6 +53,9 @@ export default function Layout(props: any) {
             aside={
                 <MediaQuery smallerThan={'lg'} styles={{ display: 'none' }}>
                     <Aside
+                        sx={(theme) => ({
+                            borderColor: theme.colorScheme === 'dark' ? theme.colors.darkBlue[6] : theme.colors.gray[1]
+                        })}
                         style={{ background: 'transparent' }}
                         p='md'
                         width={{ lg: 250, xl: 300 }}
@@ -76,7 +72,7 @@ export default function Layout(props: any) {
             })}
         >
             <>
-                {/* <BreadCrumbs breadCrumbs={breadCrumbs} /> */}
+                <BreadCrumbs breadCrumbs={breadCrumbs} />
                 {props.children}
             </>
         </AppShell>

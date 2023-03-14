@@ -1,8 +1,7 @@
 
 import type { Section, Topic } from '@prisma/client';
-import type { CompletionRequest } from '../../types/index';
 import { filterAndTranslateTo } from '../filterAndTranslateTo';
-import { answerAi } from './AiFetcher.server';
+import { answerAi, AiFetcher, AiMessagesArray } from './AiFetcher.server';
 import { jobWrite } from './jobWrite.server';
 
 export type ReturnAfterGenerate = Promise<(Section | Topic)[] | (Section | Topic) | number | {
@@ -18,22 +17,33 @@ export async function generateBlogSections(uid: number, pid: number, opts: { blo
         return { error: errorMessage }
     }
 
-    let model: CompletionRequest = {
-        model: 'text-davinci-003',
-        prompt: `Expand the Blog Theme in to the high level blog sections.
+    const prompt = `Expand the Blog Theme in to the high level blog sections.
 Blog Theme: ${resultEn}
 Generate ${generateNum} blog sections.
 Answer in JSON array:\n
 [{
     "sectionTitle": "",
     "sectionMetaDescription": "",
-}]\n\n`,
-        temperature: 0.6,
-        max_tokens: 2000,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-        stream: false,
+}]\n\n`
+
+    let model = {};
+
+    if (AiFetcher.IS_IT_CHAT) {
+        model = {
+            model: AiFetcher.MODEL,
+            messages: AiMessagesArray(prompt).forWriter
+        }
+    } else {
+        model = {
+            model: AiFetcher.MODEL,
+            prompt,
+            temperature: 0.6,
+            max_tokens: 2000,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            stream: false,
+        }
     }
 
     const answer = await answerAi(uid, model)

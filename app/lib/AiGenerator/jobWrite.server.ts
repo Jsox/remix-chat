@@ -1,11 +1,11 @@
-import { type Completition } from "@prisma/client";
-import { filterAndTranslateTo } from "../filterAndTranslateTo";
 import { prismaClient } from "../Prisma";
-import { type ReturnAfterGenerate } from "./generateBlogSections.server";
+import type { Job } from "./AiGenerator.server";
+import { type ErrorAnswer, errorHandler } from "./errorHandler";
 
-export type Job = 'generateBlogSections' | 'generateBlogSectionTopicsTitles'
-
-export async function jobWrite(uid: number, pid: number, job: Job, data: string, completion: Completition, needToParseJson: boolean = true): ReturnAfterGenerate {
+export type ReturnAfterJobWrite = Promise<ErrorAnswer | number | {
+    error: string;
+}>
+export async function jobWrite(uid: number, pid: number, job: Job, data: string, cid: number, needToParseJson: boolean = true): ReturnAfterJobWrite {
     const dJSON = require('dirty-json');
     try {
         let answer = null
@@ -17,20 +17,14 @@ export async function jobWrite(uid: number, pid: number, job: Job, data: string,
         }
 
         switch (job) {
-            case 'generateBlogSections':
+            case 'blogSections':
                 if (!Array.isArray(readyData) || readyData.length === 0) {
-                    throw new Error('Ничего не записано в jobWrite:generateBlogSections')
+                    throw new Error('Ошибка. Повторите позже')
                 }
 
-                const { error, errorMessage, resultEn, resultRu } = await filterAndTranslateTo(readyData, 'ru', 'html')
-
-                if (error) {
-                    throw new Error(errorMessage)
-                }
-
-                const toWrite = resultRu.map(d => ({
+                const toWrite = readyData.map(d => ({
                     ...d,
-                    completitionId: completion.id,
+                    chatCompletitionId: cid,
                     userId: uid,
                     projectId: pid
                 }))
@@ -44,13 +38,10 @@ export async function jobWrite(uid: number, pid: number, job: Job, data: string,
                 break;
 
             default:
-                throw new Error('Ничего не записано в jobWrite')
+                throw new Error('Ошибка. Повторите позже')
         }
         return answer;
     } catch (error: any) {
-        console.log('jobWrite.error', error)
-        return {
-            error: error?.message
-        }
+        return errorHandler({ message: 'Ошибка. Повторите позже', from: 'jobWrite', data: error, returnJson: true})
     }
 }

@@ -6,7 +6,6 @@ import { } from 'openai';
 export type NavbarSearchProps = {
     opened: boolean;
     toggle: VoidFunction;
-    user: User | null;
     addons?: any[] | null;
     navBarLinks: NavBarLinks;
 };
@@ -30,6 +29,7 @@ export interface CompletionResponseChoicesInner {
     'index'?: number;
     'logprobs'?: CompletionResponseChoicesInnerLogprobs | null;
     'finish_reason'?: string;
+    'message'?: { role: string, content: string }
 }
 
 export interface CompletionResponseUsage {
@@ -45,6 +45,21 @@ export interface CompletionResponse {
     'model': string;
     'choices': Array<CompletionResponseChoicesInner>;
     'usage'?: CompletionResponseUsage;
+    error?: string;
+}
+
+export interface ChatCompletionResponseChoicesInner {
+    'index'?: number;
+    'delta': { content?: string }
+    'finish_reason'?: string;
+}
+export interface ChatCompletionResponse {
+    'id': string;
+    'object': string;
+    'created': number;
+    'model': string;
+    'choices': Array<ChatCompletionResponseChoicesInner>;
+    'error'?: string;
 }
 
 export type CompletionRequestPrompt = Array<any> | Array<number> | Array<string> | string;
@@ -54,6 +69,7 @@ export interface CompletionRequest {
     /**
      * ID of the model to use. You can use the [List models](/docs/api-reference/models/list) API to see all of your available models, or see our [Model overview](/docs/models/overview) for descriptions of them.
      */
+    'messages': Array<Record<string, string>>,
     'model': string;
     'prompt'?: CompletionRequestPrompt | null;
     /**

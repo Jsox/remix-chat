@@ -3,9 +3,10 @@ import { Authenticator } from 'remix-auth';
 import { sessionStorage } from './session.server';
 
 import { GitHubStrategy } from 'remix-auth-github';
-import { userGetOrCreate } from 'app/lib/Prisma';
+import { prismaClient, userGetOrCreate } from 'app/lib/Prisma';
 
 import { GoogleStrategy } from 'remix-auth-google';
+import ISR from 'faster-query';
 // import { GoogleCredentialStrategy } from 'remix-auth-google-credential';
 
 export let authenticator = new Authenticator<User>(sessionStorage);
@@ -63,5 +64,13 @@ authenticator.use(googleStrategy);
 
 export default async function auth(request: Request): Promise<User | null> {
     let user = (await authenticator.isAuthenticated(request)) || null;
+    if (user) {
+        user = await prismaClient.user.findFirst({
+            where: {
+                id: user.id,
+            }
+        })
+    }
     return user;
 }
+    

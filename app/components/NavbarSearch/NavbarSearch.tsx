@@ -1,24 +1,23 @@
-import { createStyles, Navbar, TextInput, Code, Badge, Group, Tooltip, ScrollArea } from '@mantine/core';
+import { createStyles, Navbar, TextInput, Code, Badge, Group, Tooltip, ScrollArea, rem } from '@mantine/core';
 import { IconSearch, IconSelector } from '@tabler/icons';
 import type { NavbarSearchProps } from '../../types';
 import { UserButton } from '../UserButton/UserButton';
 import LogOutButton from '../LogOutButton';
 import LoginButtons from '../auth/LoginButtons';
 import { LinksGroup } from '../NavbarLinksGroup/NavbarLinksGroup';
+import { useOutletContext } from '@remix-run/react';
+import AnimatedNumbers from "react-animated-numbers";
+import { useHydrated } from 'remix-utils';
 
 const useStyles = createStyles((theme) => ({
     navbar: {
         paddingTop: 0,
-        background: theme.colorScheme === 'dark' ? theme.colors.darkBlue[7] : theme.colors.gray[0],
-        width: { sm: 200, lg: 300 },
+        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.darkBlue[7] : theme.colors.gray[0],
+        // width: { sm: 200, lg: 300 },
+        // width: 300,
+        borderColor: theme.colorScheme === 'dark' ? theme.colors.darkBlue[6] : theme.colors.gray[1]
     },
     section: {
-        // marginLeft: -theme.spacing.md,
-        // marginRight: -theme.spacing.md,
-        // [theme.fn.smallerThan('sm')]: {
-        //     marginLeft: 0,
-        //     marginRight: 0,
-        // },
         marginBottom: theme.spacing.md,
         '&:not(:last-of-type)': {
             borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.darkBlue[6] : theme.colors.gray[1]}`,
@@ -38,15 +37,10 @@ const useStyles = createStyles((theme) => ({
         color: theme.colorScheme === 'dark' ? theme.white : theme.black,
         borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
     },
-
-    // links: {
-    //     // marginLeft: -theme.spacing.md,
-    //     // marginRight: -theme.spacing.md,
-    // },
-
     linksInner: {
-        paddingTop: theme.spacing.xl,
-        paddingBottom: theme.spacing.xl,
+        // paddingTop: theme.spacing.md,
+        // paddingBottom: theme.spacing.md,
+        padding: `${theme.spacing.md} 0 `
     },
 
     footer: {
@@ -58,13 +52,17 @@ const useStyles = createStyles((theme) => ({
 
 export function NavbarSearch(props: NavbarSearchProps) {
     const { navBarLinks, addons = [] } = props;
-    const { opened, toggle, user } = props;
+    const { opened, toggle } = props;
     const { classes } = useStyles();
+    const { user, userTokens } = useOutletContext()
 
     const links = navBarLinks.map((item, i) => <LinksGroup index={i} {...item} key={item.label} />);
 
+    const gradientTokens = userTokens < 1 ? { from: 'red', to: 'grape', deg: 35 } : { from: 'green', to: 'teal', deg: 35 }
+    const hydrated = useHydrated()
+
     return (
-        <Navbar hidden={!opened} width={{ sm: 300 }} p="md" className={classes.navbar}>
+        <Navbar px={{ md: 'xs', lg: 'xl' }} hidden={!opened} width={{ md: 270, lg: 300, xl: 330 }} p="md" className={classes.navbar}>
             <Navbar.Section className={classes.section}>
                 {user && (
                     <UserButton
@@ -78,8 +76,15 @@ export function NavbarSearch(props: NavbarSearchProps) {
                     <Group align={'center'} grow m="xs">
                         <LogOutButton />
                         <Tooltip label="Токенов на балансе">
-                            <Badge size="xl" variant="gradient" gradient={{ from: 'red', to: 'yellow', deg: 35 }}>
-                                {user.tokens?.toLocaleString()} τ
+                            <Badge size="xl" variant="gradient" gradient={gradientTokens}>
+                                {/* {hydrated && <AnimatedNumbers
+                                    animateToNumber={userTokens}
+                                    locale="ru-RU"
+                                    configs={(number, index) => {
+                                        return { mass: 1, tension: 230 * (index + 1), friction: 140 };
+                                    }}
+                                ></AnimatedNumbers>} */}
+                                {userTokens.toLocaleString()} τ
                             </Badge>
                         </Tooltip>
                     </Group>

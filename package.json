@@ -22,7 +22,7 @@
     "@mantine/modals": "^6.0.0",
     "@mantine/notifications": "^6.0.0",
     "@mantine/nprogress": "^6.0.0",
-    "@mantine/prism": "^6.0.0",
+    "@mantine/prism": "^6.0.1",
     "@mantine/remix": "^6.0.0",
     "@mantine/ssr": "^6.0.0",
     "@mantine/tiptap": "^6.0.0",
@@ -72,6 +72,7 @@
     "remix-auth-google-credential": "^0.1.0",
     "remix-utils": "^6.0.0",
     "slugify": "^1.6.5",
+    "uniqid": "^5.4.0",
     "yandex-cloud-translate": "^1.0.0"
   },
   "devDependencies": {

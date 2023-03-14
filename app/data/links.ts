@@ -7,6 +7,7 @@ import {
     IconAdjustments,
     IconLock,
     type TablerIcon,
+    IconSpeakerphone,
 } from '@tabler/icons';
 
 export type NavBarLinks = {
@@ -24,6 +25,7 @@ export type NavBarLinks = {
 
 export const navBarLinks: NavBarLinks = [
     { label: 'Главная', icon: IconGauge, link: '/' },
+    { label: 'Общий чат с Аишей', icon: IconSpeakerphone, link: '/public/chat' },
     {
         label: 'Сгенерировать тексты',
         icon: IconWritingSign,
