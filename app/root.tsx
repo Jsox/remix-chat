@@ -34,7 +34,6 @@ import { ServerOverload } from './components/ServerOverload/ServerOverload';
 import { CustomFonts } from './fonts/CustomFonts';
 
 import ProgressBar from './components/ProgressBar';
-import { useEventSource } from 'remix-utils';
 // import PWALinks from "./components/PWALinks";
 
 export const meta: MetaFunction = () => ({
@@ -49,16 +48,20 @@ export async function loader({ request, context }: LoaderArgs) {
 
     const user = (await auth(request)) || null;
 
-    let uniqueUserString: string = ''
+    let uniqueUserString: string = '';
     if (!user) {
         const uniqid = require('uniqid');
-        uniqueUserString = uniqid()
+        uniqueUserString = uniqid();
     } else {
         const md5 = require('md5');
-        uniqueUserString = md5(user)
+        uniqueUserString = md5(user);
     }
 
-    return json({ userLoader: user, expressFingerprint, uniqueUserString });
+    return json({
+        userLoader: user,
+        expressFingerprint,
+        uniqueUserString,
+    });
 }
 
 export function CatchBoundary() {
@@ -150,33 +153,48 @@ export function RootLayout(props: PropsWithChildren) {
 // export const links: LinksFunction = () => {
 //     return [{ rel: "manifest", href: "/resources/manifest.webmanifest" }];
 // };
+export type NavBarLinksAddon = { projects: []; sections: [] } | {}
+export type Aside = [];
+
+export interface IOutletContext {
+    user: User | null;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+    userTokens: number | null;
+    setUserTokens: React.Dispatch<React.SetStateAction<number | null>>;
+    navBarLinksAddon: NavBarLinksAddon;
+    setNavBarLinksAddon: React.Dispatch<React.SetStateAction<NavBarLinksAddon>>;
+    aside: Aside;
+    setAside: React.Dispatch<React.SetStateAction<Aside>>;
+}
 export default function App() {
-    const { userLoader, expressFingerprint, uniqueUserString } = useLoaderData();
+    const { userLoader, expressFingerprint, uniqueUserString } =
+        useLoaderData();
 
     const [user, setUser] = useState<User | null>(userLoader);
-    const [navBarLinksAddon, setNavBarLinksAddon] = useState([]);
-    const [aside, setAside] = useState([]);
+    const [navBarLinksAddon, setNavBarLinksAddon] = useState<NavBarLinksAddon>(
+        []
+    );
+    const [aside, setAside] = useState<Aside>([]);
     const [userTokens, setUserTokens] = useState(user ? user.tokens : 0);
     const [breadCrumbs, setBreadCrumbs] = useState([]);
 
+    const context: IOutletContext = {
+        user,
+        setUser,
+        userTokens,
+        setUserTokens,
+        navBarLinksAddon,
+        setNavBarLinksAddon,
+        aside,
+        setAside,
+        breadCrumbs,
+        setBreadCrumbs,
+        expressFingerprint,
+        uniqueUserString,
+    };
     return (
         <RootLayout>
-            <Outlet
-                context={{
-                    user,
-                    setUser,
-                    userTokens,
-                    setUserTokens,
-                    navBarLinksAddon,
-                    setNavBarLinksAddon,
-                    aside,
-                    setAside,
-                    breadCrumbs,
-                    setBreadCrumbs,
-                    expressFingerprint,
-                    uniqueUserString
-                }}
-            />
+            <Outlet context={{ ...context }} />
         </RootLayout>
     );
 }

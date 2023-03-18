@@ -5,15 +5,15 @@ export function useColors() {
 	const { colorScheme } = useMantineColorScheme();
 
 	const gradientTitleColor = {
-        from: colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.blue[8],
-        to: colorScheme === 'dark' ? theme.colors.blue[3] : theme.colors.blue[9],
-        // deg: 180,
-    };
+		from: colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.blue[8],
+		to: colorScheme === 'dark' ? theme.colors.blue[3] : theme.colors.blue[9],
+		// deg: 180,
+	};
 	const gradientTitle = {
-        variant: 'gradient',
-        gradient: gradientTitleColor,
-    };
-	
+		variant: 'gradient',
+		gradient: gradientTitleColor,
+	};
+
 	const contrastColor = colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.dark[9];
 	const primaryTextColor = colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.gray[0];
 	const primaryBackgroundColor = colorScheme === 'dark' ? theme.colors.primary[9] : theme.colors.primary[6];
@@ -25,7 +25,18 @@ export function useColors() {
 	const bodyBackgroundColor = colorScheme === 'dark' ? theme.colors.darkBlue[7] : theme.colors.gray[0];
 
 	const header = colorScheme === 'dark' ? theme.colors.darkBlue[8] : theme.colors.darkBlue[2];
+
+	const mainGradient = colorScheme === 'dark' ? {
+		from: theme.colors.darkBlue[4],
+		to: theme.colors.pink[9],
+		deg: 7
+	} : {
+			from: theme.colors.darkBlue[2],
+		to: theme.colors.pink[6],
+		deg: 7
+	}
 	return {
+		mainGradient,
 		contrastColor,
 		gradientTitleColor,
 		gradientTitle,

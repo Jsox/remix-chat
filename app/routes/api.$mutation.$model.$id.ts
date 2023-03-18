@@ -16,6 +16,7 @@ export async function action({ request, params }: ActionArgs) {
 
     const form = await request.formData();
     const action = await form.get('action');
+    const value = await form.get('value');
 
     if (!user || !id || !model || !mutation) {
         return json(null, 404);
@@ -27,7 +28,7 @@ export async function action({ request, params }: ActionArgs) {
 
 
     if (model === 'section') {
-        const SM = new SectionMutator(id, `${action}`, user);
+        const SM = new SectionMutator(id, `${action}`, user, value);
         answer = await SM.action()
     }
 
@@ -37,7 +38,7 @@ export async function action({ request, params }: ActionArgs) {
 }
 
 class SectionMutator {
-    constructor(public id: number | string, public actionName: string, public user: User) {
+    constructor(public id: number | string, public actionName: string, public user: User, public value: string = '') {
 
     }
 
@@ -46,7 +47,7 @@ class SectionMutator {
             let answer: any = null;
 
             switch (this.actionName) {
-                case 'setActiveFalse':
+                case 'setActive':
 
                     const exists = await prismaClient.section.findFirst({
                         where: {
@@ -63,7 +64,7 @@ class SectionMutator {
                             id: parseInt(this.id),
                         },
                         data: {
-                            active: false
+                            active: this.value === 'true' ? true : false
                         }
                     })
 

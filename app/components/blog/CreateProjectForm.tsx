@@ -8,6 +8,7 @@ interface ICreateProjectForm extends TextInputProps {
 }
 export default function CreateProjectForm(props: ICreateProjectForm) {
     const focusTrapRef = useFocusTrap();
+    const { mainGradient } = useColors();
     return (
         <TextInput
             ref={focusTrapRef}
@@ -25,8 +26,9 @@ export default function CreateProjectForm(props: ICreateProjectForm) {
                     mt={-2}
                     size={46}
                     radius="xl"
-                    variant="filled"
-                    bg={'primary'}
+                    variant={'gradient'}
+                    gradient={mainGradient}
+                    // bg={'primary'}
                     // c={primaryTextColor}
                 >
                     <IconPlus size={26} stroke={1.5} />

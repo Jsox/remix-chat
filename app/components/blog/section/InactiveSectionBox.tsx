@@ -1,11 +1,21 @@
 import { Box, Avatar, Tooltip, ActionIcon, Text, Highlight } from "@mantine/core"
 import { IconTrashOff, IconArrowUpCircle } from "@tabler/icons"
 import type { Section } from '@prisma/client';
+import { useFetcher } from '@remix-run/react';
 
 function InactiveSectionBox({ section, markedText }: { section: Section, markedText?: string }) {
+    const sectionFromTrashFetcher = useFetcher()
+    const fromTrashing = sectionFromTrashFetcher.state !== 'idle'
     const sectionFromTrash = (id: number) => {
-        console.log('section from trash', id)
+        sectionFromTrashFetcher.submit({
+            action: 'setActive',
+            value: 'true'
+        }, {
+            action: `/api/update/section/${id}`,
+            method: 'post'
+        })
     }
+
     return (
         <Box sx={(theme) => ({
             display: 'flex',
@@ -28,7 +38,7 @@ function InactiveSectionBox({ section, markedText }: { section: Section, markedT
 
             <Avatar size={56} color={'red'}><IconTrashOff /></Avatar>
             <Box w={'100%'}>
-                
+
                 <Text size={'lg'}>
                     <Highlight highlight={markedText || ''}>
                         {section.sectionTitle}
@@ -47,7 +57,7 @@ function InactiveSectionBox({ section, markedText }: { section: Section, markedT
                 label={'Восстановить Раздел'}
                 style={{ zIndex: 9999 }}
             >
-                <ActionIcon onClick={() => sectionFromTrash(section.id)} color={'blue'} variant={'filled'} style={{ transition: 'all .3 ease' }} size="lg">
+                <ActionIcon disabled={fromTrashing} loading={fromTrashing} onClick={() => sectionFromTrash(section.id)} color={'blue'} variant={'filled'} style={{ transition: 'all .3 ease' }} size="lg">
                     <IconArrowUpCircle size="1.25rem" />
                 </ActionIcon>
             </Tooltip>

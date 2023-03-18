@@ -1,16 +1,16 @@
 import { type ChatCompletition } from '@prisma/client';
 import { type ChatCompletionResponse } from '../../types/index';
 import { prismaClient } from '../Prisma';
-import { AiFetcher } from './AiFetcher.server';
 import { type ErrorAnswer, errorHandler } from './errorHandler';
+import { fromTextToTokens } from './AiGenerator.server';
 
-export async function completionWrite(uid: number, query: string, completion: ChatCompletionResponse, chatCompletionText: string): Promise<ChatCompletition | ErrorAnswer> {
+export async function completionWrite(uid: number, query: string, completion: ChatCompletionResponse, chatCompletionText: string, totalTokens: number): Promise<ChatCompletition | ErrorAnswer> {
     try {
         const data: ChatCompletition = {
             query,
             answer: chatCompletionText,
             created: completion?.created ? new Date(completion?.created) : new Date(Date.now()),
-            totalChars: chatCompletionText.length,
+            totalTokens,
             messageId: completion.id,
             userId: uid,
         }

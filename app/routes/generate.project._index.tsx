@@ -95,7 +95,7 @@ export default function GenerateProject() {
                     <CreateProjectForm
                         error={newProjectFetcher?.data?.error}
                         description={
-                            'Например: "Генерация блога с помощью ИИ", "Производство мороженого"'
+                            'Например: "Разработка приложений на языке Golang", "Производство мороженого"'
                         }
                         descriptionProps={{
                             align: 'center',
@@ -118,10 +118,9 @@ export default function GenerateProject() {
                             direction="column"
                             wrap="wrap"
                         >
-                            {
-                                projects.map((pr: Project) => (
-                                    <ProjectCard key={pr?.url} project={pr} />
-                                ))}
+                            {projects.map((pr: Project) => (
+                                <ProjectCard key={pr?.url} project={pr} />
+                            ))}
                         </Flex>
                     </>
                 )}

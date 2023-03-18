@@ -2,12 +2,12 @@ import { Box, Button, Grid, Input } from '@mantine/core';
 import { IconQuestionMark, IconSend } from '@tabler/icons';
 import { useColors } from './../hooks/useColors';
 import useBreakpoints from './../hooks/useBreakpoint';
-import { useFetcher, useTransition } from '@remix-run/react';
+import { useFetcher, useNavigation } from '@remix-run/react';
 import { useInputState } from '@mantine/hooks';
 
 export default function InputChatForm() {
     const { isXs } = useBreakpoints();
-    const transition = useTransition();
+    const transition = useNavigation();
     const isSubmitting = transition.state !== 'idle';
     const { primaryStyles, primaryTextColor } = useColors();
     const [stringValue, setStringValue] = useInputState('');

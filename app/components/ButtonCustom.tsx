@@ -4,9 +4,11 @@ import type { TablerIcon } from '@tabler/icons';
 export interface ButtonCustomProps {
     Icon?: TablerIcon;
     avatarColor?: string;
-    avatarText: string;
     title: string;
     desc: string;
+    onClick?: (data: any, options: any) => void;
+    component?: any;
+    to?: string
 }
 const useStyles = createStyles((theme) => {
     return {

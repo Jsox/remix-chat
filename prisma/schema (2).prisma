@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["filteredRelationCount","fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -20,6 +19,7 @@ model User {
   didPay           Boolean?           @default(false)
   password         String?
   chatMessages     ChatMessage[]
+  Completitions    Completition[]
   Projects         Project[]
   Sections         Section[]
   Topics           Topic[]
@@ -29,17 +29,19 @@ model User {
 }
 
 model ChatMessage {
-  id                 Int               @id @default(autoincrement())
-  userId             Int
-  prompt             String
-  created            DateTime          @default(now())
-  totalTokens        Int?
-  messageId          String            @unique
-  conversationId     String?
-  text               String
-  user               User              @relation(fields: [userId], references: [id])
-  ChatCompletition   ChatCompletition? @relation(fields: [chatCompletitionId], references: [id])
-  chatCompletitionId Int?
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  prompt           String
+  created          DateTime @default(now())
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  messageId        String   @unique
+  conversationId   String?
+  parentMessageId  String?
+  model            String?
+  text             String
+  user             User     @relation(fields: [userId], references: [id])
 
   @@index([messageId, conversationId])
   @@index([userId], map: "ChatMessage_userId_fkey")
@@ -52,18 +54,30 @@ model Translate {
   hash String @unique
 }
 
+model Completition {
+  id               Int      @id @default(autoincrement())
+  query            String   @db.VarChar(65535)
+  answer           String   @db.VarChar(65535)
+  created          DateTime @default(now())
+  promptTokens     Int
+  completionTokens Int
+  totalTokens      Int
+  messageId        String   @unique
+  userId           Int
+  User             User     @relation(fields: [userId], references: [id])
+}
+
 model ChatCompletition {
-  id          Int           @id @default(autoincrement())
-  query       String        @db.VarChar(65535)
-  answer      String        @db.VarChar(65535)
-  created     DateTime      @default(now())
-  totalTokens  Int
-  messageId   String        @unique
+  id          Int       @id @default(autoincrement())
+  query       String    @db.VarChar(65535)
+  answer      String    @db.VarChar(65535)
+  created     DateTime  @default(now())
+  totalTokens Int
+  messageId   String    @unique
   userId      Int
-  User        User          @relation(fields: [userId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
   Section     Section[]
   Topic       Topic[]
-  ChatMessage ChatMessage[]
 }
 
 model Project {
@@ -95,9 +109,6 @@ model Section {
   active                 Boolean           @default(true)
   ChatCompletition       ChatCompletition? @relation(fields: [chatCompletitionId], references: [id])
   chatCompletitionId     Int?
-
-  @@fulltext([sectionTitle])
-  @@fulltext([sectionTitle, sectionMetaTitle, sectionHtmlDescription, sectionMetaDescription, sectionKeyWords])
 }
 
 model Topic {

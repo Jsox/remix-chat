@@ -30,6 +30,7 @@ export class AiGenerator {
     chatCompletionResponse: ChatCompletionResponse;
     chatCompletion: ChatCompletition | ErrorAnswer;
     totalChars: number = 0
+    totalTokens: number = 0
     completion: Completition | ErrorAnswer | null = null
 
     constructor(opts: AiGeneratorOpts) {
@@ -68,24 +69,24 @@ export class AiGenerator {
     }
 
     async writeOffUserChars(message: string) {
-        const totalChars = message?.length
-        console.log({ totalChars })
-        if (totalChars) {
-            await prismaClient.user.update({
-                where: {
-                    id: this.user.id,
-                },
-                data: {
-                    tokens: {
-                        decrement: totalChars
-                    }
+        console.log("🚀 ~ file: AiGenerator.server.ts:81 ~ AiGenerator ~ writeOffUserChars ~ this.totalTokens:", this.totalTokens)
+        await prismaClient.user.update({
+            where: {
+                id: this.user.id,
+            },
+            data: {
+                tokens: {
+                    decrement: this.totalTokens
                 }
-            })
-        }
-        return totalChars
+            }
+        })
+
+        return this.totalTokens
     }
 
     async fetch(): Promise<string | ErrorAnswer> {
+        this.totalTokens = 0
+        this.chatCompletionText = ''
         try {
             if (!this.user) {
                 errorHandler({
@@ -101,7 +102,7 @@ export class AiGenerator {
             }
             const options = this.buildFetchOptions()
 
-            this.chatCompletionText = ''
+
             const onMessage = (data: string) => {
                 if (data != '[DONE]') {
                     let chatCompletion: ChatCompletionResponse = JSON.parse(data)
@@ -122,6 +123,7 @@ export class AiGenerator {
                     console.log(dataText);
 
                     if (dataText) {
+                        this.totalTokens++;
                         this.chatCompletionText += dataText;
                         this.emit(dataText.replace(/\n/g, "\\n"))
                     }
@@ -138,7 +140,7 @@ export class AiGenerator {
                 body: JSON.stringify(options)
             })
 
-            this.chatCompletion = await completionWrite(this.user.id, this.promptText, this.chatCompletionResponse, this.chatCompletionText)
+            this.chatCompletion = await completionWrite(this.user.id, this.promptText, this.chatCompletionResponse, this.chatCompletionText, this.totalTokens)
 
             sendToTelegram({ completion: this.completion })
 
@@ -267,4 +269,13 @@ export const completionRequestParamsTemplate = {
     frequency_penalty: 0,
     presence_penalty: 0,
     stream: true,
+}
+
+export function fromTextToTokens(text: string) {
+    let tokensArray = text.match(/\\[^]|\.{3}|\w+|[^\w\s]/gu);
+    console.log("🚀 ~ file: AiGenerator.server.ts:275 ~ fromTextToTokens ~ tokensArray:", tokensArray)
+    let tokens = tokensArray.length
+    console.log("🚀 ~ file: AiGenerator.server.ts:277 ~ fromTextToTokens ~ tokens:", tokens)
+
+    return tokens
 }

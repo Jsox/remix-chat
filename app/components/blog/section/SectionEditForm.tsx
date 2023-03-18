@@ -34,7 +34,6 @@ export default function SectionEditForm({ section }: { section: Section }) {
         className: classes.input,
         size: 'md'
     }
-    const unkey = useId()
 
     for (const key in SectionFields) {
         if (Object.prototype.hasOwnProperty.call(SectionFields, key)) {

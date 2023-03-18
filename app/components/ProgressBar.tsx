@@ -1,10 +1,15 @@
-import { startNavigationProgress, setNavigationProgress, completeNavigationProgress, NavigationProgress } from "@mantine/nprogress";
-import { useTransition } from "@remix-run/react";
+import { nprogress, NavigationProgress } from "@mantine/nprogress";
+import { useNavigation } from "@remix-run/react";
 import { useEffect } from "react";
 
 export default function ProgressBar() {
-    const { state, type, submission, location } = useTransition()
+    const { state, location } = useNavigation()
+    
     let started = false
+
+    // useEffect(() => {
+    //     console.log("🚀 ~ file: ProgressBar.tsx:7 ~ ProgressBar ~ location:", location)
+    // }, [location])
 
     useEffect(() => {
         // console.log({ started });
@@ -12,13 +17,13 @@ export default function ProgressBar() {
         if (state !== 'idle' && !started) {
             started = true
             // console.log('START', { started });
-            startNavigationProgress()
-            setNavigationProgress(10)
+            nprogress.start()
+            nprogress.set(10)
         }
         if (state === 'idle') {
             started = false
             // console.log('FIN', { started });
-            completeNavigationProgress()
+            nprogress.complete()
         }
 
     }, [state])
