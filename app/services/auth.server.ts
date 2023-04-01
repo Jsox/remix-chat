@@ -3,27 +3,71 @@ import { Authenticator } from 'remix-auth';
 import { sessionStorage } from './session.server';
 
 import { GitHubStrategy } from 'remix-auth-github';
-import { prismaClient, userGetOrCreate } from 'app/lib/Prisma';
 
 import { GoogleStrategy } from 'remix-auth-google';
-import ISR from 'faster-query';
-// import { GoogleCredentialStrategy } from 'remix-auth-google-credential';
+import { TelegramStrategy } from './TelegramStrategy';
+
+import prisma from 'prisma/client';
 
 export let authenticator = new Authenticator<User>(sessionStorage);
 
+let select = {
+    id: true,
+    email: true,
+    phone: true,
+    name: true,
+    avatar: true,
+    // tokens: true,
+    // didPay: true,
+    isAdmin: true,
+}
+
+// let telegramStrategy = new TelegramStrategy(
+//     {
+        
+//     },
+//     (came) => {
+//         console.log("🚀 ~ file: auth.server.ts:30 ~ came:", came)
+//         // let lastEmail = profile?.emails?.length - 1
+//         // let pretender = {
+//         //     email: profile?.emails?.[0]?.value,
+//         //     name: profile.displayName || '[не указано]',
+//         //     avatar: profile.photos[0]?.value || null,
+//         // }
+//         // console.log("🚀 ~ file: auth.server.ts:42 ~ pretender:", pretender)
+//         // return prisma.user.upsert({
+//         //     create: pretender,
+//         //     update: pretender,
+//         //     where: {
+//         //         email: profile.emails[0].value,
+//         //     },
+//         //     select
+//         // })
+//         return { came }
+//     }
+// );
 let gitHubStrategy = new GitHubStrategy(
     {
         clientID: process.env.GH_CLIENT_ID || '',
         clientSecret: process.env.GH_CLIENT_SECRETS || '',
         callbackURL: 'http://localhost:3000/auth/github/callback',
     },
-    async ({ accessToken, extraParams, profile }) => {
-        return userGetOrCreate({
-            email: profile.emails[0].value,
-            name: profile.name.familyName || 'Not provided',
-            fingerprint: profile?._json?.node_id || null,
+    ({ accessToken, extraParams, profile }) => {
+        // let lastEmail = profile?.emails?.length - 1
+        let pretender = {
+            email: profile?.emails?.[0]?.value,
+            name: profile.displayName || '[не указано]',
             avatar: profile.photos[0]?.value || null,
-        });
+        }
+        console.log("🚀 ~ file: auth.server.ts:42 ~ pretender:", pretender)
+        return prisma.user.upsert({
+            create: pretender,
+            update: pretender,
+            where: {
+                email: profile.emails[0].value,
+            },
+            select
+        })
     }
 );
 
@@ -33,44 +77,40 @@ let googleStrategy = new GoogleStrategy(
         clientSecret: process.env.GOOGLE_CLIENT_SECRETS || '',
         callbackURL: 'http://localhost:3000/auth/google/callback',
     },
-    async ({ accessToken, refreshToken, extraParams, profile }) => {
-        console.log('!!!!!!!!!!!!!', { accessToken }, { extraParams }, { profile });
-        return userGetOrCreate({
+    ({ accessToken, refreshToken, extraParams, profile }) => {
+        let pretender = {
             email: profile.emails[0].value,
-            name: profile.displayName || 'Not provided',
-            fingerprint: profile.id,
-            avatar: profile.photos[0],
-        });
+            name: profile.displayName || '[не указано]',
+            avatar: profile.photos[0].value || null,
+        }
+        console.log("🚀 ~ file: auth.server.ts:42 ~ pretender:", pretender)
+        return prisma.user.upsert({
+            create: pretender,
+            update: pretender,
+            where: {
+                email: profile.emails[0].value,
+            },
+            select
+        })
     }
 );
-// const googleCredentialStrategy = new GoogleCredentialStrategy(
-//     {
-//         clientId: 'YOUR_CLIENT_ID',
-//         credentialId: 'fingerprint', // name of form field that stores credential. Default: credential
-//     },
-//     async (profile) => {
-//         return userGetOrCreate({
-//             email: profile.emails[0].value,
-//             name: profile.displayName || 'Not provided',
-//             fingerprint: profile.id,
-//             avatar: profile.photos[0],
-//         });
-//     }
-// );
+
 
 authenticator.use(gitHubStrategy);
 authenticator.use(googleStrategy);
-// authenticator.use(googleCredentialStrategy);
+// authenticator.use(telegramStrategy);
 
-export default async function auth(request: Request): Promise<User | null> {
+export default async function auth(request: Request, fromDB = false): Promise<User | null> {
     let user = (await authenticator.isAuthenticated(request)) || null;
-    if (user) {
-        user = await prismaClient.user.findFirst({
+
+    if (user?.id && fromDB) {
+        user = await prisma.user.findFirst({
             where: {
                 id: user.id,
             }
         })
     }
+    // console.log("🚀 ~ file: auth.server.ts:66 ~ auth ~ user:", user, { fromDB })
     return user;
 }
-    
+

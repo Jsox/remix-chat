@@ -6,9 +6,32 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Superscript from '@tiptap/extension-superscript';
 import SubScript from '@tiptap/extension-subscript';
+import Image from '@tiptap/extension-image';
+import { createStyles } from '@mantine/core';
 
-export default function RichEditorText({html}:{html: Content}) {
+const useStyles = createStyles((theme) => {
+    return {
+        content: {
+            '& p': {
+                margin: '25px 15px 25px 30px',
+            },
+            '& ul li': {
+                margin: '15px 10px 10px 10px',
+            },
+        },
+    };
+});
+export default function RichEditorText({ html, onChange }: { html: Content; onChange: (val: string) => void }) {
+    const { classes } = useStyles();
+
+    Image.configure({
+        allowBase64: true,
+    });
+    
     const editor = useEditor({
+        onUpdate: (updated) => {
+            onChange(updated.editor.getHTML());
+        },
         extensions: [
             StarterKit,
             Underline,
@@ -16,10 +39,12 @@ export default function RichEditorText({html}:{html: Content}) {
             Superscript,
             SubScript,
             Highlight,
+            Image,
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
         ],
         content: html || '',
     });
+
 
     return (
         <RichTextEditor editor={editor}>
@@ -51,6 +76,7 @@ export default function RichEditorText({html}:{html: Content}) {
                 </RichTextEditor.ControlsGroup>
 
                 <RichTextEditor.ControlsGroup>
+                    {/* <RichTextEditor.Image /> */}
                     <RichTextEditor.Link />
                     <RichTextEditor.Unlink />
                 </RichTextEditor.ControlsGroup>
@@ -63,7 +89,7 @@ export default function RichEditorText({html}:{html: Content}) {
                 </RichTextEditor.ControlsGroup>
             </RichTextEditor.Toolbar>
 
-            <RichTextEditor.Content />
+            <RichTextEditor.Content className={classes.content} />
         </RichTextEditor>
     );
 }

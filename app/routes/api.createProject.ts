@@ -9,6 +9,7 @@ export async function loader() {
 
 export async function action({ request }: ActionArgs) {
     const user = await auth(request);
+    console.log("🚀 ~ file: api.createProject.ts:12 ~ action ~ user:", user)
     if (!user?.id) {
         return json({ error: 'Нужно авторизоваться, что-бы начать работу с генерацией текстов!' });
     }

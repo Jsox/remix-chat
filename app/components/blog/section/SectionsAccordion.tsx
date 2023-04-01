@@ -1,5 +1,6 @@
 import {
     Accordion,
+    Box,
     createStyles,
     Flex,
     Pagination,
@@ -42,7 +43,6 @@ export default function SectionsAccordion({
 }) {
     let sections: Section[] = project.Sections;
 
-    // const { searchParams } = useOutletContext();
     const { classes } = useStyles();
     const hydrated = useHydrated();
 
@@ -58,7 +58,7 @@ export default function SectionsAccordion({
 
     useEffect(() => {
         changeSearchStr(search);
-    }, [search]);
+    }, [search, changeSearchStr]);
 
     if (search.length > 2) {
         pageInit = 1;
@@ -109,14 +109,6 @@ export default function SectionsAccordion({
         );
     }, [debouncedSearchStr]);
 
-    // const [sectionsUpdated, setSectionsUpdated] = useState(false);
-    // useDidUpdate(() => {
-    //     setSectionsUpdated(true);
-    //     setTimeout(() => {
-    //         setSectionsUpdated(false);
-    //     }, 100);
-    // }, [page]);
-
     return (
         <>
             <PageTitle title={`Разделы Блога`} />
@@ -159,6 +151,7 @@ export default function SectionsAccordion({
                 >
                     {sections.map((section, i) => (
                         <ItemAccordion
+                            activeSection={parseInt((activeSection || '0'))}
                             markedText={debouncedSearchStr}
                             key={section.id}
                             project={project}
@@ -187,34 +180,23 @@ export default function SectionsAccordion({
             )}
 
             {needsPagination && (
-                <Pagination
-                    m={'lg'}
-                    total={totalPages}
-                    value={page}
-                    onChange={onPageChange}
-                />
-                //                 <Pagination.Root
-                //     total={totalPages}
-                //     value={page}
-                //     onChange={onPageChange}
-                //     getItemProps={(page) => ({
-                //         component: { NavLink },
-                //         // ariaLabel: {`На страницу ${page}`},
-                //         to: `?page=${page}`,
-                //     })}
-                // >
-                //     <Group spacing={7} position="center" mt="xl">
-                //         <Pagination.First component={NavLink} to="#page-0" />
-                //         <Pagination.Previous component={NavLink} to="#page-1" />
-                //         <Pagination.Items aria-label={`На страницу ${page}`} />
-                //         <Pagination.Next component={NavLink} to="#page-2" />
-                //         <Pagination.Last component={NavLink} to="#page-10" />
-                //     </Group>
-                // </Pagination.Root>
+                <Box>
+                    <Pagination
+                        position={'center'}
+                        m={'lg'}
+                        total={totalPages}
+                        value={page}
+                        onChange={onPageChange}
+                    />
+                </Box>
             )}
 
             <PageTitle title={'Разделы Блога в корзине'} />
-            <Spoiler maxHeight={320} showLabel="Показать все" hideLabel="Скрыть">
+            <Spoiler
+                maxHeight={320}
+                showLabel="Показать все"
+                hideLabel="Скрыть"
+            >
                 <Flex align={'center'} direction={'column'}>
                     {sectionsTrash.length ? (
                         sectionsTrash.map((section) => (

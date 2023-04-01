@@ -11,6 +11,7 @@ export let sessionStorage = createCookieSessionStorage({
         httpOnly: true, // for security reasons, make this cookie http only
         secrets: [process.env.SESSION_SECRETS || ''], // replace this with an actual secret
         secure: true, //process.env.NODE_ENV === 'production', // enable this in prod only
+        expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
     },
 });
 

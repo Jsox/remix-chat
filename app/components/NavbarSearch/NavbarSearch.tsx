@@ -91,7 +91,8 @@ export function NavbarSearch(props: NavbarSearchProps) {
     const { navBarLinks, addons = [] } = props;
     const { opened, toggle } = props;
     const { classes } = useStyles();
-    const { user, userTokens } = useOutletContext<IOutletContext>();
+    const context = useOutletContext<IOutletContext>();
+    const { user = null, userTokens = 0} = context || {}
 
     const links = navBarLinks.map((item, i) => (
         <LinksGroup index={i} {...item} key={item.label} />

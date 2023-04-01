@@ -1,5 +1,4 @@
 import {
-    Transition,
     Accordion,
     Title,
     Flex,
@@ -13,14 +12,21 @@ import {
     Highlight,
     Button,
 } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import type { Project, Section } from '@prisma/client';
-import { NavLink, useFetcher } from '@remix-run/react';
-import { IconWriting, IconListDetails, IconTrash } from '@tabler/icons';
+import { NavLink, useFetcher, useOutletContext } from '@remix-run/react';
+import {
+    IconWriting,
+    IconListDetails,
+    IconTrash,
+    IconAlertCircle,
+} from '@tabler/icons';
 import ButtonCustom from 'app/components/ButtonCustom';
-import useHashObject from 'app/hooks/useHashObject';
 import { getTimeFromNow } from 'app/hooks/useTime';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useHydrated } from 'remix-utils';
 import SectionEditForm from './SectionEditForm';
+import { useEffect } from 'react';
 
 const useStyles = createStyles((theme) => ({
     item: {
@@ -69,26 +75,54 @@ export default function ItemAccordion({
     section,
     project,
     markedText,
+    activeSection,
 }: {
     section: Section;
     project: Project;
     markedText?: string;
+    activeSection: number;
 }) {
+
     const { classes } = useStyles();
 
-    const editSectionFetcher = useFetcher();
+    const { uniqueUserString } = useOutletContext();
 
-    useEffect(() => {
-        // console.log({ editSectionFetcher });
-    }, [editSectionFetcher]);
-
-    const onSubmit = (data: any, options: any) => {
-        console.log(
-            '🚀 ~ file: ItemAccordion.tsx:64 ~ onSubmit ~ data, options:',
-            data,
-            options
+    const sectionExtendFetcher = useFetcher();
+    const isIdle = sectionExtendFetcher.state === 'idle';
+    const onSubmitSectionExtend = (data: any, options: any) => {
+        sectionExtendFetcher.submit(
+            {
+                sid: section.id.toString(),
+                uniqueUserString,
+            },
+            {
+                action: '/api/createSectionExtend',
+                method: 'post',
+            }
         );
     };
+
+    useEffect(() => {
+        if (sectionExtendFetcher.data) {
+            if (sectionExtendFetcher.data?.error) {
+                showNotification({
+                    id: 'sectionExtendFetcher',
+                    title: 'Ошибка!',
+                    message: sectionExtendFetcher.data.error,
+                    color: 'red',
+                    icon: <IconAlertCircle />,
+                });
+            }
+            if (!sectionExtendFetcher.data?.error) {
+                // console.log(
+                //     '🚀 ~ file: ItemAccordion.tsx:89 ~ sectionExtendFetcher.data:',
+                //     { section }
+                // );
+            }
+        }
+    }, [sectionExtendFetcher]);
+
+    const hydrated = useHydrated();
 
     return (
         <Accordion.Item
@@ -116,40 +150,36 @@ export default function ItemAccordion({
                         </Highlight>
                     </Text>
                     <Text pt={'md'} align={'end'}>
-                        {getTimeFromNow(section.created)}
+                        {hydrated ? getTimeFromNow(section.created) : ''}
                     </Text>
                 </>
             </AccordionControl>
             <Accordion.Panel>
-                <editSectionFetcher.Form
-                    action={`/api/update/section/${section.id}`}
-                    method={'post'}
+                <Flex
+                    gap="lg"
+                    justify={'space-between'}
+                    align="center"
+                    wrap="wrap"
                 >
-                    <Flex
-                        gap="lg"
-                        justify={'space-between'}
-                        align="center"
-                        wrap="wrap"
-                    >
-                        <ButtonCustom
-                            onClick={onSubmit}
-                            Icon={IconWriting}
-                            avatarColor={'grape'}
-                            title={'Сгенерировать'}
-                            desc={'недостающие тексты раздела'}
-                        />
-                        <ButtonCustom
-                            component={NavLink}
-                            to={`/generate/project/${project.url}/${section.slug}`}
-                            Icon={IconListDetails}
-                            avatarColor={'orange'}
-                            title={'Сгенерировать'}
-                            desc={'статьи по этому разделу'}
-                        />
-                    </Flex>
+                    <ButtonCustom
+                        disabled={!isIdle}
+                        onClick={onSubmitSectionExtend}
+                        Icon={IconWriting}
+                        avatarColor={'grape'}
+                        title={'Сгенерировать'}
+                        desc={'недостающие тексты раздела'}
+                    />
+                    <ButtonCustom
+                        component={NavLink}
+                        to={`/generate/project/${project.url}/${section.slug}`}
+                        Icon={IconListDetails}
+                        avatarColor={'orange'}
+                        title={'Сгенерировать'}
+                        desc={'статьи по этому разделу'}
+                    />
+                </Flex>
 
-                    <SectionEditForm section={section} />
-                </editSectionFetcher.Form>
+                {activeSection === section.id && <SectionEditForm section={section} />}
             </Accordion.Panel>
         </Accordion.Item>
     );
@@ -165,9 +195,7 @@ function AccordionControl(props: IAccordionControlProps) {
 
     const trashing = sectionToTrashFetcher.state !== 'idle';
 
-    const sectionToTrash = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const sectionToTrash = () => {
         sectionToTrashFetcher.submit(
             {
                 action: 'setActive',

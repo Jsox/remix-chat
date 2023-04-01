@@ -8,7 +8,7 @@ function BigButton(props: ButtonProps) {
             loaderPosition={'center'}
             color={'primary'}
             mt={'xl'}
-            style={{ transition: 'all .3s ease' }}
+            style={{ transition: 'all .3s ease', border: '2px solid #371753' }}
             fullWidth
             size={'xl'}
             gradient={mainGradient}

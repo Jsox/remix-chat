@@ -3,14 +3,15 @@ import {
     json,
     type MetaFunction,
     type ActionArgs,
+    redirect,
 } from '@remix-run/node';
-import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react';
+import { ShouldRevalidateFunction, useFetcher, useLoaderData, useOutletContext } from '@remix-run/react';
 import { HeroText } from 'app/components/HeroText/HeroText';
 import { useEffect } from 'react';
-import { type User, type Project, Section } from '@prisma/client';
+import type { User, Project, Section } from '@prisma/client';
 import { prismaClient } from 'app/lib/Prisma';
 import auth from 'app/services/auth.server';
-import { Button, Container, Text } from '@mantine/core';
+import { Container, Text } from '@mantine/core';
 import { useTime } from 'app/hooks/useTime';
 import { useColors } from 'app/hooks/useColors';
 import SectionsAccordion from 'app/components/blog/section/SectionsAccordion';
@@ -34,7 +35,8 @@ export async function action({ request, context }: ActionArgs) {
     const message = formData.get('message');
     const uniqueUserString = formData.get('uniqueUserString');
 
-    emitter.emit(uniqueUserString, message);
+    if (typeof uniqueUserString === 'string')
+        emitter.emit(uniqueUserString, message);
     return json({ message });
 }
 
@@ -115,22 +117,21 @@ export async function loader({ request, params, context }: LoaderArgs) {
                 },
                 where,
                 include: {
-                    Topics: true
-                }
+                    Topics: true,
+                },
             },
         },
     });
     if (!currentProject) {
-        throw json(null, 404);
+        return redirect('/generate/project');
     }
     const sectionsTrash = await prismaClient.section.findMany({
         where: {
             ...where,
             active: false,
-            projectId: currentProject.id
+            projectId: currentProject.id,
         },
     });
-    console.log("🚀 ~ file: generate.project.$projectSlug._index.tsx:142 ~ loader ~ sectionsTrash:", sectionsTrash)
 
     return json({ projectSlug, currentProject, user, sectionsTrash });
 }
@@ -139,14 +140,11 @@ export default function ProjectPage() {
     const { user, currentProject, sectionsTrash } = useLoaderData<{
         user: User;
         currentProject: Project;
-        sectionsTrash: Section[]
+        sectionsTrash: Section[];
     }>();
 
-    const {
-        setBreadCrumbs,
-        uniqueUserString,
-        setUserTokens,
-    }: any = useOutletContext();
+    const { setBreadCrumbs, uniqueUserString, setUserTokens }: any =
+        useOutletContext();
 
     const { fromNow, formatString } = useTime(currentProject.created);
     const { contrastColor } = useColors();
@@ -204,7 +202,7 @@ export default function ProjectPage() {
     useEffect(() => {
         if (
             genSecFetcher.data &&
-            genSecFetcher.data.result.decremented &&
+            genSecFetcher.data?.result?.decremented &&
             !genSecFetcher.data?.error
         ) {
             showNotification({
@@ -215,7 +213,7 @@ export default function ProjectPage() {
                 icon: <IconCheck />,
             });
 
-            setUserTokens((exist) => {
+            setUserTokens((exist: boolean) => {
                 return exist - genSecFetcher.data.result.decremented;
             });
         }
@@ -228,12 +226,13 @@ export default function ProjectPage() {
                 icon: <IconAlertCircle />,
             });
         }
-    }, [genSecFetcher.data]);
+    }, [genSecFetcher.data, setUserTokens]);
 
     const isFetching = genSecFetcher.state !== 'idle';
 
     return (
         <>
+            <EventStreamer />
             <HeroText
                 titleStart={
                     <Text tt={'capitalize'} size={24}>
@@ -252,13 +251,6 @@ export default function ProjectPage() {
                 >
                     Сгенерировать разделы Блога
                 </BigButton>
-                {/* <Form method="post" >
-                    <input type="hidden" value={uniqueUserString} name={'uniqueUserString'} />
-                    <Textarea minRows={5} m={'xl'} name="message" />
-                    <Button type={'submit'}>Send</Button>
-                </Form> */}
-
-                <EventStreamer />
                 <SectionsAccordion
                     project={currentProject}
                     sectionsTrash={sectionsTrash}
@@ -267,3 +259,38 @@ export default function ProjectPage() {
         </>
     );
 }
+
+
+export const shouldRevalidate: ShouldRevalidateFunction = ({
+    actionResult,
+    currentParams,
+    currentUrl,
+    defaultShouldRevalidate,
+    formAction,
+    formData,
+    formEncType,
+    formMethod,
+    nextParams,
+    nextUrl,
+}) => {
+    console.log('root', {
+        actionResult,
+        currentParams,
+        currentUrl,
+        defaultShouldRevalidate,
+        formAction,
+        formData,
+        formEncType,
+        formMethod,
+        nextParams,
+        nextUrl,
+    });
+    return true;
+    // if (actionResult?.revalidate) {
+    //     console.log('🚀 ~ file: root.tsx:229 ~ revalidate: ', revalidate);
+    //     return true;
+    // } else {
+    //     console.log('🚀 ~ file: root.tsx:229 ~ revalidate:', false);
+    //     return false;
+    // }
+};

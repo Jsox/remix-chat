@@ -8,13 +8,16 @@ export interface ErrorProps {
     // false by default
     returnJson?: boolean
 }
-export type ErrorAnswer = { error: string, data?: any; } | void
+export type ErrorAnswer = { error: string, data?: any } | void
 
 export function errorHandler(props: ErrorProps): ErrorAnswer {
 
     const { message, from = 'not defined', data = {}, returnJson = false } = props
 
     sendToTelegram(props)
+
+    console.log(JSON.stringify(props), null, 2);
+    
 
     if (!returnJson) {
         throw new Error(message);
@@ -26,11 +29,17 @@ export function errorHandler(props: ErrorProps): ErrorAnswer {
 export async function sendToTelegram(obj: any): Promise<void> {
     const message = JSON.stringify(obj, null, 2)
 
-    console.log('FROM TG', message);
+    const sent = await fetch(`https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: process.env.TG_ADMIN_CHAT_ID,
+            text: message
+        })
+    }).catch(err => {
+        console.log
+            ('ERROR sendToTelegram', err.message)
+    })
 
-
-    // await fetch(`https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}/sendMessage?chat_id=${process.env.TG_ADMIN_CHAT_ID}&text=${message}`)
-    //     .catch(err => {
-    //         throw new Error(err.message)
-    //     })
+    // console.log((await sent.json()));
 }

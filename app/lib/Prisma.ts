@@ -1,64 +1,30 @@
 import {
-    PrismaClient,
     type User,
     type ChatMessage,
-    type MessageAuthor,
 } from '@prisma/client';
 import ISR from 'faster-query';
-import auth from 'app/services/auth.server';
 
-let prisma: PrismaClient;
-
-if (!global.prisma) {
-    global.prisma = new PrismaClient();
-}
-prisma = global.prisma;
+import prisma from 'prisma/client';
+import { sendToTelegram } from './AiGenerator/errorHandler';
 
 class Prisma {
-    static async userGetOrCreate(data: User): Promise<User> {
-        const start = Date.now();
-        let where = {};
-        if (data.phone) {
-            where = {
-                phone: data.phone,
-            };
-        } else if (data.email) {
-            where = {
+    static async userGetOrCreateFromSocials(data: any): Promise<User> {
+        let exists = await prisma.user.findUnique({
+            where: {
                 email: data.email,
-            };
-        } else {
-            where = {
-                fingerprint: data.fingerprint,
-            };
-        }
-        let exists = async () =>
-            await prisma.user.findUnique({
-                where,
-            });
-        let key = data.phone || data.fingerprint || data.email;
-        const userExists = new ISR(exists, {
-            key,
-            cacheTime: 1000,
+            },
         });
-        exists = await userExists.getData();
 
-        console.log({ exists });
-
-        if (exists) {
+        if (exists?.id) {
             exists.password = '******';
-            console.log(
-                'Got from cache userGetOrCreate for:',
-                Date.now() - start + 'ms'
-            );
             return exists;
         }
 
         const newUser = await prisma.user.create({
             data,
         });
-        console.log({ newUser });
         newUser.password = '******';
-        console.log('CREATED userGetOrCreate for:', Date.now() - start + 'ms');
+        sendToTelegram({ newUser })
         return newUser;
     }
 
@@ -109,5 +75,6 @@ class Prisma {
 
 export const prismaClient = prisma;
 export const getProjects = Prisma.getProjects;
-export const userGetOrCreate = Prisma.userGetOrCreate;
+export const userGetOrCreateFromSocials = Prisma.userGetOrCreateFromSocials;
 export const getUserMessages = Prisma.getUserMessages;
+

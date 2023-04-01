@@ -19,7 +19,7 @@ export async function fetchSSE(
         }
     });
 
-    if (!res.body.getReader) {
+    if (!res.body?.getReader) {
         // Vercel polyfills `fetch` with `node-fetch`, which doesn't conform to
         // web standards, so this is a workaround...
         const body: NodeJS.ReadableStream = res.body as any;

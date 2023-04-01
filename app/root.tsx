@@ -44,9 +44,7 @@ export const meta: MetaFunction = () => ({
 createEmotionCache({ key: 'mantine' });
 
 export async function loader({ request, context }: LoaderArgs) {
-    const { fingerprint: expressFingerprint } = context;
-
-    const user = (await auth(request)) || null;
+    const user = await auth(request, true);
 
     let uniqueUserString: string = '';
     if (!user) {
@@ -59,7 +57,6 @@ export async function loader({ request, context }: LoaderArgs) {
 
     return json({
         userLoader: user,
-        expressFingerprint,
         uniqueUserString,
     });
 }
@@ -153,7 +150,7 @@ export function RootLayout(props: PropsWithChildren) {
 // export const links: LinksFunction = () => {
 //     return [{ rel: "manifest", href: "/resources/manifest.webmanifest" }];
 // };
-export type NavBarLinksAddon = { projects: []; sections: [] } | {}
+export type NavBarLinksAddon = { projects: []; sections: [] } | {};
 export type Aside = [];
 
 export interface IOutletContext {
@@ -167,8 +164,7 @@ export interface IOutletContext {
     setAside: React.Dispatch<React.SetStateAction<Aside>>;
 }
 export default function App() {
-    const { userLoader, expressFingerprint, uniqueUserString } =
-        useLoaderData();
+    const { userLoader, uniqueUserString } = useLoaderData();
 
     const [user, setUser] = useState<User | null>(userLoader);
     const [navBarLinksAddon, setNavBarLinksAddon] = useState<NavBarLinksAddon>(
@@ -178,7 +174,7 @@ export default function App() {
     const [userTokens, setUserTokens] = useState(user ? user.tokens : 0);
     const [breadCrumbs, setBreadCrumbs] = useState([]);
 
-    const context: IOutletContext = {
+    const context: any = {
         user,
         setUser,
         userTokens,
@@ -189,7 +185,6 @@ export default function App() {
         setAside,
         breadCrumbs,
         setBreadCrumbs,
-        expressFingerprint,
         uniqueUserString,
     };
     return (

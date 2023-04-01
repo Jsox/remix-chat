@@ -6,12 +6,14 @@ import auth from 'app/services/auth.server';
 import { AiGenerator } from './../lib/AiGenerator/AiGenerator.server';
 
 export async function loader() {
-    throw json(null, 404);
+    throw new Response('нет такой страницы', {
+        status: 404
+    });
 };
 
 export async function action({ request }: ActionArgs) {
 
-    const user = await auth(request);
+    const user = await auth(request, true);
     if (!user?.id) {
         return json({ error: 'Нужно авторизоваться' });
     }
@@ -19,9 +21,9 @@ export async function action({ request }: ActionArgs) {
     const form = await request.formData();
     const query = (await form.get('query'))?.toString();
     const uniqueUserString = (await form.get('uniqueUserString'))?.toString();
-    let pid: FormDataEntryValue | null | number = (await form.get('pid'));
+    let pid: string | number = (await form.get('pid'))?.toString() || '0';
 
-    pid = parseInt(pid) || null;
+    pid = parseInt(pid);
 
     if (!query || !pid) {
         return json({ error: 'Неверный запрос' });
@@ -33,8 +35,14 @@ export async function action({ request }: ActionArgs) {
             userId: user.id
         },
         include: {
-            Sections: true
-        }
+            Sections: {
+                orderBy: {
+                    created: 'desc'
+                },
+                take: 10
+            }
+        },
+        
     })
 
     if (!project) {
@@ -42,15 +50,13 @@ export async function action({ request }: ActionArgs) {
     }
 
     const Generator = new AiGenerator({
-        job: 'blogSections',
         user,
-        project,
         uniqueUserString
     })
 
     
 
-    const result = await Generator.blogSections()
+    const result = await Generator.blogSections(project)
 
     if (result?.error) {
         return json({ error: result?.error });

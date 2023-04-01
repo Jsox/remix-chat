@@ -55,24 +55,25 @@ app.all(
     MODE === "production" ?
         createRequestHandler({
             build: require("./build"),
-            getLoadContext: (req, res, next) => {
-                console.log({ fingerprint: req.fingerprint })
-                return {
-                    fingerprint: req.fingerprint.hash
-                }
-            },
+            mode: MODE
+            // getLoadContext: (req, res, next) => {
+            //     console.log({ fingerprint: req.fingerprint })
+            //     return {
+            //         fingerprint: req.fingerprint.hash
+            //     }
+            // },
         }) :
         (req, res, next) => {
             purgeRequireCache();
             const build = require("./build");
             return createRequestHandler({
                 build,
-                getLoadContext: (req, res, next) => {
+                // getLoadContext: (req, res, next) => {
                     
-                    return {
-                        fingerprint: req?.fingerprint.hash
-                    }
-                },
+                //     return {
+                //         fingerprint: req?.fingerprint.hash
+                //     }
+                // },
                 mode: MODE
             })(req, res, next);
         }

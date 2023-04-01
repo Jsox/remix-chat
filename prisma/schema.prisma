@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["filteredRelationCount","fullTextSearch", "fullTextIndex"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount", "fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -13,11 +13,11 @@ model User {
   email            String?            @unique
   name             String?
   avatar           String?
-  fingerprint      String             @unique
   isAdmin          Boolean?           @default(false)
   phone            String?            @unique
   tokens           Int?               @default(1000)
   didPay           Boolean?           @default(false)
+  active           Boolean?           @default(true)
   password         String?
   chatMessages     ChatMessage[]
   Projects         Project[]
@@ -25,21 +25,22 @@ model User {
   Topics           Topic[]
   ChatCompletition ChatCompletition[]
 
-  @@index([fingerprint, id])
+  @@index([id])
 }
 
 model ChatMessage {
-  id                 Int               @id @default(autoincrement())
-  userId             Int
-  prompt             String
-  created            DateTime          @default(now())
-  totalTokens        Int?
-  messageId          String            @unique
-  conversationId     String?
-  text               String
-  user               User              @relation(fields: [userId], references: [id])
-  ChatCompletition   ChatCompletition? @relation(fields: [chatCompletitionId], references: [id])
-  chatCompletitionId Int?
+  id                    Int               @id @default(autoincrement())
+  userId                Int?
+  created               DateTime          @default(now())
+  totalTokens           Int?
+  messageId             String?           @unique
+  conversationId        String?
+  answerToChatMessageId Int?
+  text                  String            @db.VarChar(65535)
+  by                    MessageAuthor
+  User                  User?             @relation(fields: [userId], references: [id])
+  ChatCompletition      ChatCompletition? @relation(fields: [chatCompletitionId], references: [id])
+  chatCompletitionId    Int?
 
   @@index([messageId, conversationId])
   @@index([userId], map: "ChatMessage_userId_fkey")
@@ -57,7 +58,7 @@ model ChatCompletition {
   query       String        @db.VarChar(65535)
   answer      String        @db.VarChar(65535)
   created     DateTime      @default(now())
-  totalTokens  Int
+  totalTokens Int
   messageId   String        @unique
   userId      Int
   User        User          @relation(fields: [userId], references: [id])
@@ -83,15 +84,16 @@ model Section {
   created                DateTime          @default(now())
   slug                   String
   sectionTitle           String
-  sectionMetaTitle       String?           @db.VarChar(65535)
-  sectionHtmlDescription String?           @db.VarChar(65535)
-  sectionMetaDescription String            @db.VarChar(65535)
-  sectionKeyWords        String?
+  sectionMetaTitle       String            @default("") @db.VarChar(500)
+  sectionHtmlDescription String            @default("") @db.Text
+  sectionMetaDescription String            @db.VarChar(1000)
+  sectionKeyWords        String            @default("") @db.VarChar(500)
   Project                Project?          @relation(fields: [projectId], references: [id])
   projectId              Int?
   User                   User              @relation(fields: [userId], references: [id])
   userId                 Int
   Topics                 Topic[]
+  isFullFilled           Boolean           @default(false)
   active                 Boolean           @default(true)
   ChatCompletition       ChatCompletition? @relation(fields: [chatCompletitionId], references: [id])
   chatCompletitionId     Int?
@@ -104,12 +106,13 @@ model Topic {
   id                   Int               @id @default(autoincrement())
   created              DateTime          @default(now())
   slug                 String
-  topicTitle           String
-  topicMetaTitle       String?
-  topicHtmlSummary     String?           @db.VarChar(65535)
-  topicMetaDescription String            @db.VarChar(65535)
-  topicHtmlPost        String?           @db.VarChar(65535)
-  topicKeyWords        String?           @db.VarChar(65535)
+  topicTitle           String            @db.VarChar(500)
+  topicMetaTitle       String            @default("") @db.VarChar(500)
+  topicHtmlSummary     String            @default("") @db.Text
+  topicMetaDescription String            @db.VarChar(1000)
+  topicHtmlPost        String            @default("") @db.Text
+  topicKeyWords        String            @default("") @db.VarChar(500)
+  isFullFilled         Boolean           @default(false)
   Project              Project?          @relation(fields: [projectId], references: [id])
   projectId            Int?
   User                 User              @relation(fields: [userId], references: [id])

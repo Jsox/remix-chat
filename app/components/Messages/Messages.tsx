@@ -1,7 +1,5 @@
 import { Box, Paper, Stack } from '@mantine/core';
 import { useScrollIntoView } from '@mantine/hooks';
-import { type User, ChatMessage } from '@prisma/client';
-import useBrowserAuth from 'app/hooks/useBrowserAuth';
 import { useColors } from 'app/hooks/useColors';
 import CommentHtml from '../Comment';
 import InputChatForm from '../InputChatForm';
@@ -17,8 +15,6 @@ interface IProps {
 export default function Messages() {
     const { user } = useOutletContext();
     const { chatMessages, setChatMessages } = {};
-
-    // const { user } = useBrowserAuth();
 
     const { targetRef, scrollIntoView } = useScrollIntoView(
         {

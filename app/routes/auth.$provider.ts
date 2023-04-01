@@ -8,6 +8,14 @@ export let loader = () => {
 
 export let action = ({ request, params, context }: ActionArgs) => {
     const { provider } = params;
+
+    switch (provider) {
+        case 'telegram':
+            
+            break;
+
+    }
+
     if (!provider) {
         throw redirect(process.env.REDIRECT_FAIL || '/');
     }

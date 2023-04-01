@@ -3,7 +3,6 @@ import { authenticator } from 'app/services/auth.server';
 
 export let loader = ({ request, params, context }: LoaderArgs) => {
     const { provider } = params;
-
     if (!provider) {
         throw redirect(process.env.REDIRECT_FAIL || '/');
     }
@@ -13,4 +12,5 @@ export let loader = ({ request, params, context }: LoaderArgs) => {
         failureRedirect: process.env.REDIRECT_FAIL || '/',
         context
     });
+
 };
